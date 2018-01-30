@@ -21,6 +21,7 @@ public class Analyse extends HttpServlet {
         try {
             json = Miner.mine(fb, tw, rd);
         } catch (Exception e) {
+            e.printStackTrace();
             httpServletResponse.getWriter().write("Failed");
             httpServletResponse.getWriter().flush();
             httpServletResponse.getWriter().close();
@@ -31,7 +32,7 @@ public class Analyse extends HttpServlet {
 
         ArrayList<String> jsonLines = new ArrayList<>();
         jsonLines.add(json);
-        Util.outputToFile(path, jsonLines);
+        Util.outputToFile(path + "output/" + id + ".data", jsonLines);
 
         httpServletResponse.getWriter().write("DONE");
         httpServletResponse.getWriter().flush();

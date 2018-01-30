@@ -3,8 +3,10 @@ package com.chrisdmilner.webapp;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -52,10 +54,12 @@ public class Util {
     public static String getAPIConfigFile() {
         String props = "";
         try {
-//            props = Util.readFileToString("/media/chris/Data/Dropbox/Uni Work/year3/CS310 - Project/analyserwebapp/src/main/resources/properties/config.properties");
-            props = Util.readFileToString("config.properties");
+            if ((new File(".").getAbsolutePath()).equals("/."))
+                props = Util.readFileToString(System.getProperty("user.dir") + "opt/tomcat/webapps/analyserwebapp/WEB-INF/classes/properties/config.properties");
+            else
+                props = Util.readFileToString(System.getProperty("user.dir") + "/src/main/resources/properties/config.properties");
         } catch (FileNotFoundException e) {
-            System.err.println("ERROR: No the API configuration file appears to be missing.");
+            System.err.println("ERROR: The API configuration file appears to be missing.");
             e.printStackTrace();
             System.exit(1);
         }
