@@ -15,9 +15,9 @@
     Random rand = new Random();
     int id = rand.nextInt(100000);
     String path = config.getServletContext().getRealPath("/");
-    while (Util.fileExists(path + "../output/" + id + ".data")) id = rand.nextInt(100000);
+    while (Util.fileExists(path + "output/" + id + ".data")) id = rand.nextInt(100000);
 
-    Util.outputToFile(path + "../output/" + id + ".data", lines);
+    Util.outputToFile(path  +  "output/" + id + ".data", lines);
 
 %>
 
@@ -37,7 +37,7 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 </head>
 
-<body data-id=<%= id %>>
+<body data-id=<%= id %> data-path=<%= path %>>
     <div id="spinner"></div>
     <h1 id="loading-text">Analysing your data</h1>
 </body>

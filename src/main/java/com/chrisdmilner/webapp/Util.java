@@ -52,7 +52,8 @@ public class Util {
     public static String getAPIConfigFile() {
         String props = "";
         try {
-            props = Util.readFileToString("/media/chris/Data/Dropbox/Uni Work/year3/CS310 - Project/analyserwebapp/src/main/resources/properties/config.properties");
+//            props = Util.readFileToString("/media/chris/Data/Dropbox/Uni Work/year3/CS310 - Project/analyserwebapp/src/main/resources/properties/config.properties");
+            props = Util.readFileToString("config.properties");
         } catch (FileNotFoundException e) {
             System.err.println("ERROR: No the API configuration file appears to be missing.");
             e.printStackTrace();

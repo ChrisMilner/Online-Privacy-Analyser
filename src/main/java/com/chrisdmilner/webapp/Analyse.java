@@ -9,9 +9,9 @@ public class Analyse extends HttpServlet {
             throws IOException {
 
         String id = httpServletRequest.getParameter("id");
+        String path = httpServletRequest.getParameter("path");
 
-        String path = "/media/chris/Data/Dropbox/Uni Work/year3/CS310 - Project/analyserwebapp/src/main/output/" + id + ".data";
-        String params = Util.readFileToString(path);
+        String params = Util.readFileToString(path + "output/" + id + ".data");
 
         String fb = Util.getConfigParameter(params, "fb=");
         String tw = Util.getConfigParameter(params, "tw=");

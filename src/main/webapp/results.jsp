@@ -24,10 +24,10 @@
 
         boolean fileFound = true;
         String id = request.getParameter("id");
-        String path = "/media/chris/Data/Dropbox/Uni Work/year3/CS310 - Project/analyserwebapp/src/main/output/" + id + ".data";
+        String path = request.getParameter("path");
         String json = "";
         try {
-            json = Util.readFileToString(path);
+            json = Util.readFileToString(path + "output/" + id + ".data");
             Util.deleteFile(path);
         } catch (FileNotFoundException e) {
             fileFound = false;

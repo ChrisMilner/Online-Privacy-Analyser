@@ -1,6 +1,7 @@
 window.onload = function () {
     var body = document.getElementsByTagName("BODY")[0];
     var id = body.getAttribute("data-id");
+    var path = body.getAttribute("data-path");
 
 	var xhttp = new XMLHttpRequest();
 
@@ -9,11 +10,12 @@ window.onload = function () {
     		console.log("REPLY");
     		console.log(this.responseText);
     		if (this.responseText === "DONE")
-                window.location.replace("results.jsp?id=" + id);
+                window.location.replace("results.jsp?id=" + id + "&path=" + path);
     		else
     		    window.location.replace("index.jsp?error=true")
     	}
   	};
-	xhttp.open("GET", "analyse?id=" + id, true);
+	console.log(path);
+	xhttp.open("GET", "analyse?id=" + id + "&path=" + path, true);
 	xhttp.send();
 };
