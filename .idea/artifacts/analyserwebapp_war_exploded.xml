@@ -1,0 +1,27 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="analyserwebapp:war exploded">
+    <output-path>$PROJECT_DIR$/target/analyserwebapp</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="analyserwebapp" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.twitter4j:twitter4j-core:4.0.6" />
+          <element id="library" level="project" name="Maven: org.facebook4j:facebook4j-core:2.4.10" />
+          <element id="library" level="project" name="Maven: net.dean.jraw:JRAW:1.0.0" />
+          <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.2.10" />
+          <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp:3.9.1" />
+          <element id="library" level="project" name="Maven: com.squareup.okio:okio:1.13.0" />
+          <element id="library" level="project" name="Maven: net.dean.jraw:moshi-deeply-nested:1.0.0" />
+          <element id="library" level="project" name="Maven: org.json:json:20090211" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/analyserwebapp/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="analyserwebapp/web/Web" />
+    </root>
+  </artifact>
+</component>

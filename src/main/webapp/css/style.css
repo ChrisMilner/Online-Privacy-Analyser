@@ -1,0 +1,290 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* =========================================================== */
+/*                            Index                            */
+/* =========================================================== */
+
+body {
+	background-color: rgb(100,180,250);
+	text-align: center;
+
+	font-family: 'Roboto', sans-serif;
+}
+
+#content {
+	width: 90%;
+
+	margin: auto;
+	margin-top: 2%;
+	margin-bottom: 5%;
+}
+
+#title {
+	font-size: 6vw;
+	font-weight: bold;
+	color: rgba(255,255,255,0.8);
+
+	margin: 6vh;
+}
+
+#description {
+	font-size: calc(1em + 0.4vw);
+	color: rgba(0,0,0,0.6);
+
+	margin: 4vh 15vw 6vh 15vw;
+
+	line-height: 1.8em;
+}
+
+#instructions {
+	font-size: calc(1em + 0.4vw);
+	color: rgba(0,0,0,0.6);
+
+	margin-bottom: 4vh;
+
+	line-height: 1.8em;
+}
+
+#start-points {
+	width: 50%;
+	margin: auto;
+	padding: 30px;
+
+	border: solid 1px rgba(255,255,255,0.6);
+}
+
+.label {
+	font-size: calc(1em + 0.4vw);
+	font-weight: bold;
+	margin-bottom: 5px;
+
+	color: rgba(0,0,0,0.8);
+}
+
+input[type="text"] {
+	margin: 5px;
+	padding: 7px 25px 7px 25px;
+	font-size: 1.2vw;
+	width: 60%;
+	margin-bottom: 30px;
+	color: rgba(0,0,0,0.6);
+	text-align: center;
+	background-color: transparent;
+	border: solid 1px white;
+}
+
+input[type="text"]:focus {
+	background-color: rgba(255,255,255,0.1);
+	outline: none;
+}
+
+input[type="submit"] {
+	margin: 10px;
+	padding: 10px;
+	font-size: 3vh;
+	width: 20%;
+
+	cursor: pointer;
+
+	background-color: transparent;
+	border: solid 2px white;
+	color: white;
+
+	transition: background-color 0.5s, color 0.5s;
+}
+
+input[type="submit"]:hover {
+	background-color: white;
+	color: black;
+}
+
+#exception {
+    font-size: calc(1em + 0.4vw);
+    color: red;
+    margin-bottom: 2vh;
+}
+
+/* =========================================================== */
+/*                         Analyse                             */
+/* =========================================================== */
+
+#spinner {
+	border: solid 16px transparent;
+	border-top: solid 16px rgba(255,255,255,0.8);
+	border-bottom: solid 16px rgba(255,255,255,0.8);
+	border-radius: 50%;
+	width: 160px;
+	height: 160px;
+	animation: spin 1s linear infinite;
+	margin: 25vh auto auto auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading-text {
+	margin-top: 5vh;
+	font-size: 42px;
+	color: rgba(255,255,255,0.8);
+	animation: pulse 2s linear infinite;
+}
+
+@keyframes pulse {
+	0% { opacity: 1; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+/* =========================================================== */
+/*                         Results                             */
+/* =========================================================== */
+
+#conclusions {
+	width: 90%;
+	border-collapse: collapse;
+	/*border: 1px solid rgba(255,255,255,0.5);*/
+	margin: auto;
+	font-size: 2vw;
+}
+
+#conclusions tr {
+	height: 10vh;
+}
+
+#conclusions tr:nth-child(even) td {
+    background-color: rgba(256, 256, 256, 0.2);
+}
+
+#conclusions tr:nth-child(odd) td {
+    background-color: rgba(256, 256, 256, 0.0);
+}
+
+#conclusions td,
+#conclusions th {
+	vertical-align: middle;
+    padding: 0.8vw;
+}
+
+#conclusions th {
+    font-weight: bold;
+}
+
+.sources {
+    color: black;
+}
+
+#conclusions td.sources:hover {
+    cursor: pointer;
+    background-color: rgba(256, 256, 256, 0.6);
+}
+
+div.source-list {
+    position: fixed;
+    top: 50%;
+    left: 125%;
+    -webkit-transform: translate(-50%,-50%);
+    -moz-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    -o-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+
+    width: 40%;
+    /*height: 60%;*/
+
+    padding: 1vw;
+
+    background-color: rgba(220, 220, 220, 0.8);
+    border: solid 2px black;
+
+    font-size: 2vw;
+
+    -webkit-transition: left 1s;
+    -moz-transition: left 1s;
+    -ms-transition: left 1s;
+    -o-transition: left 1s;
+    transition: left 1s;
+}
+
+div.source-list.centered {
+    left: 50%;
+}
+
+div.source-list h2 {
+    margin-bottom: 2vh;
+    font-size: 4vw;
+}
+
+div.source-list li {
+    padding-bottom: 10px;
+}
+
+div.source-list h3 {
+    padding-top: 10px;
+}
+
+div.source-list h3:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+div#error {
+    width: 60%;
+    margin: auto;
+}
+
+div#error h2 {
+    font-size: 2.2vw;
+    font-weight: bold;
+    color: red;
+    margin-top: 10vh;
+	margin-bottom: 2vh;
+}
+
+div#error p {
+    font-size: 1.2vw;
+    color: gray(1);
+}
