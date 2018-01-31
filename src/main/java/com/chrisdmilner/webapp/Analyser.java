@@ -3,15 +3,13 @@ package com.chrisdmilner.webapp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 public class Analyser {
 
     public static void main(String[] args) {
         FactBook fb = new FactBook();
+        fb.addFact(new Fact<>("Name", "chrism", "Twitter", "UserProfile"));
         fb.addFact(new Fact<>("Name", "Christopher David Milner", "Facebook", "UserProfile"));
         fb.addFact(new Fact<>("Name", "ChrisDMilner97", "Twitter", "UserProfile"));
         fb.addFact(new Fact<>("Name", "Chris Milner", "Twitter", "UserProfile"));
@@ -120,6 +118,11 @@ public class Analyser {
             for (int i = 0; i < part.size(); i++)
                 initConfidences.add(getConfidenceFromSource(part.get(i).getSource(), part.get(i).getSubSource()));
 
+            // Sorts the facts by their confidence.
+            Collections.sort(part, Comparator.comparing(item -> initConfidences.get(part.indexOf(item))));
+            Collections.reverse(part);
+            initConfidences.sort(Comparator.reverseOrder());
+
             confidence = initConfidences.get(0);
             sources.add(part.get(0).getSourceString());
 
@@ -128,6 +131,8 @@ public class Analyser {
                 while (part.size() != 1) {
                     val1 = ((String) part.get(0).getValue()).toLowerCase();
                     val2 = ((String) part.get(1).getValue()).toLowerCase();
+
+                    System.out.println("Comparing " + val1 + " and " + val2);
 
                     if (val1.equals(val2) || val1.contains(val2) || val2.contains(val1)) {
                         sources.add(part.get(1).getSourceString());
@@ -147,6 +152,8 @@ public class Analyser {
                             sources.add(part.get(0).getSourceString());
                         }
                     }
+
+                    System.out.println("Took " + part.get(0).getValue() + " Confidence: " + confidence);
 
                     if (part.size() > 1) initConfidences.remove(1);
                 }
@@ -252,9 +259,9 @@ public class Analyser {
         double confidence = 0;
 
         switch (source) {
-            case "Twitter": confidence = 0.8; break;
+            case "Twitter": confidence = 0.6; break;
             case "Facebook": confidence = 0.95; break;
-            case "Reddit": confidence = 0.4; break;
+            case "Reddit": confidence = 0.2; break;
         }
 
         switch (subsource) {
