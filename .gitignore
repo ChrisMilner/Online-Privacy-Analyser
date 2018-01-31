@@ -36,3 +36,4 @@ buildNumber.properties
 
 properties/
 .idea/
+output/*.data
