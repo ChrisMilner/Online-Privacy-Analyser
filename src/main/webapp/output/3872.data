@@ -1,0 +1,1 @@
+{"conclusions":[{"name":"First Name", "value":"Chris", "confidence":0.91976, "sources":["Facebook.UserProfile", "Twitter.UserProfile"]},{"name":"Middle Name", "value":"D", "confidence":0.8, "sources":["Facebook.UserProfile", "Twitter.UserProfile"]},{"name":"Last Name", "value":"Milner", "confidence":0.91976, "sources":["Facebook.UserProfile", "Twitter.UserProfile"]}]}

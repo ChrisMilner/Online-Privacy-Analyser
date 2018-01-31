@@ -63,7 +63,7 @@ public class Analyser {
                     // Divide by capitals
                     tokens = value.split("(?=\\p{Upper})");
                     if (tokens.length > 1) addNameTokens(fb, tokens, name);
-                    else fb.addFact(new Fact<>("First Name", value, name.getSource(), name.getSubSource()));
+                    else fb.addFact(new Fact<>("First Name", removeNonLetters(value), name.getSource(), name.getSubSource()));
                 }
             }
 
@@ -90,6 +90,11 @@ public class Analyser {
     }
 
     private static void addNameTokens(FactBook fb, String[] tokens, Fact source) {
+        for (int i = 0; i < tokens.length; i++) {
+            tokens[i] = removeNonLetters(tokens[i]);
+//            System.out.println(tokens[i]);
+        }
+
         fb.addFact(new Fact<>("First Name", tokens[0], source.getSource(), source.getSubSource()));
         fb.addFact(new Fact<>("Last Name", tokens[tokens.length - 1], source.getSource(), source.getSubSource()));
 
@@ -147,12 +152,30 @@ public class Analyser {
                 }
             }
 
+            ArrayList<String> names;
+            if (namePart.equals("Last Name"))
+                names = Util.readResourceFileLines("data/lastnames.csv");
+            else
+                names = Util.readResourceFileLines("data/firstnames.csv");
+
+            String candidateName = (String) part.get(0).getValue();
+            for (String name : names) {
+                if (candidateName.equals(name)) {
+                    confidence += ((1 - confidence) * 0.8);
+                    break;
+                }
+            }
+
             System.out.println(namePart + ": " + part.get(0).getValue() + "  Confidence: " + confidence);
             String[] sourceArr = sources.toArray(new String[sources.size()]);
-            conclusions.add(new Conclusion(namePart, (String) part.get(0).getValue(), confidence, sourceArr));
+            conclusions.add(new Conclusion(namePart, candidateName, confidence, sourceArr));
         }
 
         return conclusions;
+    }
+
+    private static String removeNonLetters(String s) {
+        return s.replaceAll("[^a-zA-Z]", "");
     }
 
     private static ArrayList<Conclusion> analyseBirthDate(FactBook f) {

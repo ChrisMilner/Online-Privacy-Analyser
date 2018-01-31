@@ -54,16 +54,32 @@ public class Util {
     public static String getAPIConfigFile() {
         String props = "";
         try {
-            if ((new File(".").getAbsolutePath()).equals("/."))
-                props = Util.readFileToString(System.getProperty("user.dir") + "opt/tomcat/webapps/analyserwebapp/WEB-INF/classes/properties/config.properties");
-            else
-                props = Util.readFileToString(System.getProperty("user.dir") + "/src/main/resources/properties/config.properties");
+            props = readFileToString(getResourceURI() + "properties/config.properties");
         } catch (FileNotFoundException e) {
             System.err.println("ERROR: The API configuration file appears to be missing.");
             e.printStackTrace();
             System.exit(1);
         }
         return props;
+    }
+
+    public static ArrayList<String> readResourceFileLines(String path) {
+        ArrayList<String> file = new ArrayList<>();
+        try {
+            file = readFileLines(getResourceURI() + path);
+        } catch (FileNotFoundException e) {
+            System.err.println("ERROR: The resource file '" + getResourceURI() + path + "' cannot be found.");
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return file;
+    }
+
+    private static String getResourceURI() {
+        if ((new File(".").getAbsolutePath()).equals("/."))
+            return System.getProperty("user.dir") + "opt/tomcat/webapps/analyserwebapp/WEB-INF/classes/";
+        else
+            return System.getProperty("user.dir") + "/src/main/resources/";
     }
 
     public static String getConfigParameter(String file, String param) {
