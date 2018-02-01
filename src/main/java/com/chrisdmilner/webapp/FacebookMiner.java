@@ -35,7 +35,6 @@ public class FacebookMiner {
 		User u = null;
 
 		try {
-            System.out.println(fb.getPermissions());
             Reading reading = new Reading().fields( "about",        "address",          "age_range",
                                                     "birthday",     "cover",            "education",
                                                     "email",        "first_name",       "gender",
@@ -113,9 +112,6 @@ public class FacebookMiner {
 		    System.out.println("Not using the Access Token");
 		    cb.setOAuthAccessToken(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
         } else cb.setOAuthAccessToken(at);
-
-//		cb.setOAuthPermissions(Util.getConfigParameter(props,"f4j.oauth.permissions="));
-        cb.setOAuthPermissions("public_profile,user_birthday,user_friends,user_work_history,user_tagged_places");
 
 		return cb;
 	}

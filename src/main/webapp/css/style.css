@@ -88,7 +88,7 @@ body {
 }
 
 #start-points {
-	width: 50%;
+	width: 60%;
 	margin: auto;
 	padding: 30px;
 
@@ -107,7 +107,7 @@ input[type="text"] {
 	margin: 5px;
 	padding: 7px 25px 7px 25px;
 	font-size: 1.2vw;
-	width: 60%;
+	width: 70%;
 	margin-bottom: 30px;
 	color: rgba(0,0,0,0.6);
 	text-align: center;
@@ -121,7 +121,7 @@ input[type="text"]:focus {
 }
 
 #fb-login-div {
-    width: 60%;
+    width: 70%;
     border: solid 1px white;
     margin: auto;
     margin-top: 1vh;
