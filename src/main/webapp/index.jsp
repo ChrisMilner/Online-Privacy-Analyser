@@ -61,46 +61,45 @@
                 <h4><a>Why do I have to do this?</a></h4>
                 <table id="fb-perms">
                     <tr>
-                        <td><input type="checkbox" name="perm-email">Email</td>
-                        <td><input type="checkbox" name="perm-hometown">Hometown</td>
-                        <td><input type="checkbox" name="perm-religion-politics">Religion/Politics</td>
+                        <td><input type="checkbox" id="perm-email">Email</td>
+                        <td><input type="checkbox" id="perm-hometown">Hometown</td>
+                        <td><input type="checkbox" id="perm-religion-politics">Religion/Politics</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" name="perm-actions">Actions</td>
-                        <td><input type="checkbox" name="perm-likes">Likes</td>
-                        <td><input type="checkbox" name="perm-status">Status</td>
+                        <td><input type="checkbox" id="perm-relationships">Relationships</td>
+                        <td><input type="checkbox" id="perm-likes">Likes</td>
+                        <td><input type="checkbox" id="perm-work">Work History</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" name="perm-about-me">About Me</td>
-                        <td><input type="checkbox" name="perm-location">Location</td>
-                        <td><input type="checkbox" name="perm-places">Places</td>
+                        <td><input type="checkbox" id="perm-about-me">About Me</td>
+                        <td><input type="checkbox" id="perm-location">Location</td>
+                        <td><input type="checkbox" id="perm-places">Places</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" name="perm-bday">Birthday</td>
-                        <td><input type="checkbox" name="perm-photos">Photos</td>
-                        <td><input type="checkbox" name="perm-videos">Videos</td>
+                        <td><input type="checkbox" id="perm-bday">Birthday</td>
+                        <td><input type="checkbox" id="perm-photos">Photos</td>
+                        <td><input type="checkbox" id="perm-videos">Videos</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" name="perm-education">Education</td>
-                        <td><input type="checkbox" name="perm-posts">Posts</td>
-                        <td><input type="checkbox" name="perm-website">Website</td>
+                        <td><input type="checkbox" id="perm-education">Education</td>
+                        <td><input type="checkbox" id="perm-posts">Posts</td>
+                        <td><input type="checkbox" id="perm-website">Website</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" name="perm-friends">Friends</td>
-                        <td><input type="checkbox" name="perm-relationship">Relationship</td>
-                        <td><input type="checkbox" name="perm-work">Work History</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" name="perm-relationships">Relationships</td>
+                        <td><input type="checkbox" id="perm-friends">Friends</td>
+                        <td><input type="checkbox" id="perm-relationship">Relationship</td>
                     </tr>
                 </table>
                 <input type="button" name="fb-login" id="fb-login" value="Login with Facebook"><br />
+                <p id="login-fail-text">Facebook authentication failed. Please try again.</p>
+                <p id="login-success-text">Facebook account authenticated.</p>
             </div>
             <h3 class="label">Twitter:</h3>
             <input type="text" name="twitter-url"><br />
             <h3 class="label">Reddit:</h3>
             <input type="text" name="reddit-url"><br />
-            <input type="submit" name="analyse">
+            <input type="submit" name="analyse"><br />
+            <input type="hidden" name="access-token" id="access-token">
         </form>
     </div>
 </body>

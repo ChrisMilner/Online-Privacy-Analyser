@@ -143,6 +143,24 @@ input[type="text"]:focus {
     cursor: pointer;
 }
 
+#login-fail-text {
+    color: darkred;
+    display: none;
+}
+
+#login-fail-text.show {
+    display: block;
+}
+
+#login-success-text {
+    color: green;
+    display: none;
+}
+
+#login-success-text.show {
+    display: block;
+}
+
 #fb-perms {
 	width: 95%;
     margin: auto;

@@ -11,11 +11,11 @@ public class Miner {
 			System.exit(1);
 		}
 
-		mine(args[0],args[1],args[2]);
+		mine(args[0],args[1],args[2], "");
 	}
 
 	// Controls all of the mining function, passes data to the anaalyser and outputs conclusions to a file.
-	public static String mine(String fb, String tw, String rd) {
+	public static String mine(String fb, String tw, String rd, String at) {
 
 		FactBook twf = new FactBook();
 		if (!tw.equals("")) {
@@ -24,9 +24,10 @@ public class Miner {
 		}
 
 		FactBook fbf = new FactBook();
-		if (!fb.equals("")) {
-			String fbId = fb.substring(fb.lastIndexOf("=") + 1);
-			fbf = FacebookMiner.mine(fbId);
+		if (!(fb.equals("") && at.equals(""))) {
+			String fbId = "";
+			if (!fb.equals("")) fbId = fb.substring(fb.lastIndexOf("=") + 1);
+			fbf = FacebookMiner.mine(fbId, at);
 		}
 
 		FactBook rdf = new FactBook();

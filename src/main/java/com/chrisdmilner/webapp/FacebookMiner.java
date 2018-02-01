@@ -10,16 +10,17 @@ public class FacebookMiner {
 
 	// FOR TEST USE
 	public static void main(String[] args) {
-		if (args.length != 1) {
-			System.err.println("ERROR incorrect number of arguments. You must give one argument: a Facebook id.");
+		if (args.length != 2) {
+			System.err.println("ERROR incorrect number of arguments. You must give two arguments: a Facebook id and an access token or ''.");
 			System.exit(1);
 		}
 
-		mine(args[0]);
+		FactBook fb = mine(args[0], args[1]);
+		System.out.println(fb.toString());
 	}
 
 	// Extracts the available Facebook data for a given user ID.
-	public static FactBook mine(String id) {
+	public static FactBook mine(String id, String at) {
 
         System.out.println("\n - STARTING FACEBOOK MINER - \n");
 
@@ -27,20 +28,35 @@ public class FacebookMiner {
 
         System.out.println("   Connecting to API and retrieving user data");
 
-		FacebookFactory ff = new FacebookFactory(configureF4J().build());
+		FacebookFactory ff = new FacebookFactory(configureF4J(at).build());
 
 		// Get the raw Facebook API user data.
 		Facebook fb = ff.getInstance();
 		User u = null;
 
 		try {
-			u = fb.getUser(id);
+            System.out.println(fb.getPermissions());
+            Reading reading = new Reading().fields( "about",        "address",          "age_range",
+                                                    "birthday",     "cover",            "education",
+                                                    "email",        "first_name",       "gender",
+                                                    "hometown",     "interested_in",    "last_name",
+                                                    "locale",       "location",         "middle_name",
+                                                    "name",         "political",        "relationship_status",
+                                                    "religion",     "significant_other","sports",
+                                                    "website",      "work");
+		    if (at.equals(""))
+			    u = fb.getUser(id, reading);
+		    else
+                u = fb.getMe(reading);
 		} catch (FacebookException e) {
 			System.err.println("   ERROR getting facebook profile");
 			e.printStackTrace();
 		}
 
 		System.out.println("   Processing the user's profile data");
+
+		System.out.println(u.toString());
+		System.out.println(u.getBirthday());
 
 		if (u.getLanguages() == null) System.out.println("null");
 		else {
@@ -83,7 +99,7 @@ public class FacebookMiner {
 		return fs;
 	}
 
-	private static ConfigurationBuilder configureF4J() {
+	private static ConfigurationBuilder configureF4J(String at) {
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 
 		String props = Util.getAPIConfigFile();
@@ -92,8 +108,14 @@ public class FacebookMiner {
 		cb.setPrettyDebugEnabled(Util.getConfigParameter(props,"f4j.prettyDebug=").equals("true"));
 		cb.setOAuthAppId(Util.getConfigParameter(props,"f4j.oauth.appId="));
 		cb.setOAuthAppSecret(Util.getConfigParameter(props,"f4j.oauth.appSecret="));
-		cb.setOAuthAccessToken(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
-		cb.setOAuthPermissions(Util.getConfigParameter(props,"f4j.oauth.permissions="));
+
+		if (at.equals("")) {
+		    System.out.println("Not using the Access Token");
+		    cb.setOAuthAccessToken(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
+        } else cb.setOAuthAccessToken(at);
+
+//		cb.setOAuthPermissions(Util.getConfigParameter(props,"f4j.oauth.permissions="));
+        cb.setOAuthPermissions("public_profile,user_birthday,user_friends,user_work_history,user_tagged_places");
 
 		return cb;
 	}

@@ -16,10 +16,11 @@ public class Analyse extends HttpServlet {
         String fb = Util.getConfigParameter(params, "fb=");
         String tw = Util.getConfigParameter(params, "tw=");
         String rd = Util.getConfigParameter(params, "rd=");
+        String at = Util.getConfigParameter(params, "at=");
 
         String json;
         try {
-            json = Miner.mine(fb, tw, rd);
+            json = Miner.mine(fb, tw, rd, at);
         } catch (Exception e) {
             e.printStackTrace();
             httpServletResponse.getWriter().write("Failed");

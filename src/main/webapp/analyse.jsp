@@ -6,11 +6,13 @@
     String fb = request.getParameter("facebook-url");
     String tw = request.getParameter("twitter-url");
     String rd = request.getParameter("reddit-url");
+    String at = request.getParameter("access-token");
 
     ArrayList<String> lines = new ArrayList<String>();
     if (fb != null) lines.add("fb=" + fb);
     if (tw != null) lines.add("tw=" + tw);
     if (rd != null) lines.add("rd=" + rd);
+    if (at != null) lines.add("at=" + at);
 
     Random rand = new Random();
     int id = rand.nextInt(100000);
