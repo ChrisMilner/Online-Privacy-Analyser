@@ -14,6 +14,7 @@ import net.dean.jraw.references.CommentReference;
 import net.dean.jraw.references.OtherUserReference;
 
 import java.io.FileNotFoundException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +27,9 @@ public class RedditMiner {
 			System.exit(1);
 		}
 
-		mine(args[0]);
+		FactBook fb = mine(args[0]);
+
+		System.out.println(fb.toString());
 	}
 
 
@@ -54,11 +57,13 @@ public class RedditMiner {
         System.out.println("   Processing the user's comments");
 		DefaultPaginator<PublicContribution<?>> commentPaginator = user.history("comments").build();
 
+        HashSet<String> subreddits = new HashSet<>();
         List<PublicContribution<?>> comments = commentPaginator.accumulateMerged(-1);
         MinedPost curr;
         for (PublicContribution<?> comment : comments) {
             curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody());
             fb.addFact(new Fact<>("Commented", curr, "Reddit", "CommentHistory"));
+            subreddits.add(comment.getSubreddit());
         }
 
         System.out.println("   Processing the user's posts");
@@ -68,7 +73,13 @@ public class RedditMiner {
         for (PublicContribution<?> post: posts) {
             curr = new MinedPost(post.getCreated(), null, null, null, post.getBody());
             fb.addFact(new Fact<>("Posted", curr, "Reddit", "PostHistory"));
+            subreddits.add(post.getSubreddit());
         }
+
+        System.out.println("   Processing the user's subreddits");
+
+        for (String subreddit : subreddits)
+            fb.addFact(new Fact<>("Interest", subreddit, "Reddit", "Subreddits"));
 
         System.out.println("\n - REDDIT MINER FINISHED - \n");
 
