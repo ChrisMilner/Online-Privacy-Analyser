@@ -1,5 +1,7 @@
 package com.chrisdmilner.webapp;
 
+import facebook4j.Facebook;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +18,7 @@ public class Analyser {
         fb.addFact(new Fact<>("Name", "Radioactive1997", "Reddit", "UserProfile"));
         fb.addFact(new Fact<>("First Name", "Christopher", "Facebook", "UserProfile"));
         fb.addFact(new Fact<>("Last Name", "Milner", "Facebook", "UserProfile"));
+        fb.addFact(new Fact<>("Image URL", "http://example.com/image.png", "Facebook", "Photos"));
 
         try {
             DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
@@ -36,6 +39,7 @@ public class Analyser {
         analyseName(f);
         conclusions.addAll(analyseNameParts(f));
         conclusions.addAll(analyseBirthDate(f));
+        conclusions.addAll(analyseImages(f));
 
         System.out.println("Number of conclusions: " + conclusions.size());
         return conclusions;
@@ -253,6 +257,20 @@ public class Analyser {
         }
 
         return conclusions;
+    }
+
+    private static ArrayList<Conclusion> analyseImages(FactBook f) {
+        ArrayList<Conclusion> conclusions = new ArrayList<>();
+
+        ArrayList<Fact> imageURLs = f.getFactsWithName("Image URL");
+
+        for (Fact url : imageURLs) {
+            double confidence =  getConfidenceFromSource(url.getSource(), url.getSubSource());
+            String[] sources = new String[] { url.getSourceString() };
+            conclusions.add(new Conclusion("Image URL", (String) url.getValue(), confidence, sources));
+        }
+
+        return  conclusions;
     }
 
     private static double getConfidenceFromSource(String source, String subsource) {

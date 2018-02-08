@@ -52,15 +52,15 @@ public class FacebookMiner {
             } else {
                 u = fb.getMe(reading);
 
-                // TODO fb.getPhotos (logged in or not)
-                ResponseList<Photo> photos = fb.getPhotos();
-                System.out.println(photos);
+                Reading r = new Reading().fields("images");
+                ResponseList<Photo> photos = fb.getPhotos(r);
+                List<Image> images;
                 for (Photo photo : photos) {
-                    System.out.println(photo);
+                     images = photo.getImages();
+                    fs.addFact(new Fact<>("Image URL", images.get(0).getSource().toString(), "Facebook", "Photos"));
                 }
 
                 // TODO fb.getVideos (logged in or not)
-
 
                 // TODO fb.getInterests etc.
                 // TODO fb.getFamily ??
@@ -87,7 +87,7 @@ public class FacebookMiner {
 		if (u.getLastName() != null) 			fs.addFact(new Fact<>("Last Name", u.getLastName(), "Facebook", "UserProfile"));
 		if (u.getUsername() != null) 			fs.addFact(new Fact<>("Username", u.getUsername(), "Facebook", "UserProfile"));
 		if (u.getPicture() != null && !u.getPicture().isSilhouette())
-		                                        fs.addFact(new Fact<>("Image URL", u.getPicture().getURL(), "Facebook", "UserProfile"));
+		                                        fs.addFact(new Fact<>("Image URL", u.getPicture().getURL().toString(), "Facebook", "UserProfile"));
 		if (u.getAgeRange() != null) { 			fs.addFact(new Fact<>("Minimum Age", u.getAgeRange().getMin(), "Facebook", "UserProfile"));
 												fs.addFact(new Fact<>("Maximum Age", u.getAgeRange().getMax(), "Facebook", "UserProfile")); }
 		if (u.getBio() != null) 				fs.addFact(new Fact<>("Description", u.getBio(), "Facebook", "UserProfile"));
@@ -143,5 +143,9 @@ public class FacebookMiner {
 
 		return cb;
 	}
+
+	private static String getURLFromImageID(Facebook fb, String id) throws FacebookException {
+        return fb.getPhoto(id).getLink().toString();
+    }
 
 }

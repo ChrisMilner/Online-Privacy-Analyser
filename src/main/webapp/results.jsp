@@ -51,13 +51,23 @@
             JSONArray conclusions = new JSONObject(json).getJSONArray("conclusions");
 
             JSONObject curr;
+            String name;
+            String value;
             for (int i = 0; i < conclusions.length(); i++) {
                 curr = conclusions.getJSONObject(i);
+                name = curr.getString("name");
+                value = curr.getString("value");
             %>
 
             <tr>
-                <td><%= curr.getString("name") %></td>
-                <td><%= curr.getString("value") %></td>
+                <td><%= name %></td>
+                <%
+                    if (name.equals("Image URL")) {
+                    %> <td><a href=<%= value %>>Link</a></td> <%
+                    } else {
+                        %> <td><%= value %></td> <%
+                    }
+                %>
                 <td><%= curr.getString("confidence") %></td>
                 <td class="sources" id=<%= i %>>Expand</td>
             </tr>
