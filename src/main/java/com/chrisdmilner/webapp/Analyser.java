@@ -1,5 +1,7 @@
 package com.chrisdmilner.webapp;
 
+import facebook4j.Facebook;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +23,7 @@ public class Analyser {
         try {
             DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
             fb.addFact(new Fact<>("Max Birth Date", df.parse("17/08/2005"), "Facebook", "UserProfile"));
+            fb.addFact(new Fact<>("Birth Year", df.parse("01/01/1997"), "Facebook", "UserProfile"));
         } catch (ParseException e) {
             System.err.println("ERROR parsing the test date(s)");
             e.printStackTrace();
@@ -189,29 +192,24 @@ public class Analyser {
 
     private static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
-
-        // Get the latest possible dates that could be their birth date.
-        ArrayList<Fact> maxBDays = f.getFactsWithName("Max Birth Date");
         HashSet<String> sources = new HashSet<>();
 
-        // Get the earliest of the max dates.
+        // Get the max and min birth dates.
+        Fact maxFact = getMaxBirthDate(f);
+        Fact minFact = getMinBirthDate(f);
         Date maxDate = null;
-        if (!maxBDays.isEmpty()) {
-            while (maxBDays.size() > 1) {
-                Date d1 = (Date) maxBDays.get(0).getValue();
-                Date d2 = (Date) maxBDays.get(1).getValue();
-                if (d2.before(d1)) maxBDays.remove(0);
-                else maxBDays.remove(1);
-            }
-            maxDate = (Date) maxBDays.get(0).getValue();
-        }
+        Date minDate = null;
+        if (maxFact != null) maxDate = (Date) maxFact.getValue();
+        if (minFact != null) minDate = (Date) minFact.getValue();
 
         ArrayList<Fact> birthYears = f.getFactsWithName("Birth Year");
 
-        // Ignore all possible birth years if they occur after the max date.
-        if (maxDate != null) {
-            for (int i = birthYears.size() - 1; i >= 0; i--)
-                if (((Date) birthYears.get(i).getValue()).after(maxDate)) birthYears.remove(i);
+        // Ignore all possible birth years if they occur after the max date or before the min date.
+        for (int i = birthYears.size() - 1; i >= 0; i--) {
+            if (maxFact != null && ((Date) birthYears.get(i).getValue()).after(maxDate))
+                birthYears.remove(i);
+            else if (minFact != null && ((Date) birthYears.get(i).getValue()).before(minDate))
+                birthYears.remove(i);
         }
 
         // Combine the remaining birth years to get a final answer.
@@ -226,19 +224,24 @@ public class Analyser {
             sources.add(birthYears.get(0).getSourceString());
 
             while (birthYears.size() > 1) {
-                Date y1 = (Date) birthYears.get(0).getValue();
-                Date y2 = (Date) birthYears.get(1).getValue();
+                Calendar y1 = Calendar.getInstance();
+                Calendar y2 = Calendar.getInstance();
+                y1.setTime((Date) birthYears.get(0).getValue());
+                y2.setTime((Date) birthYears.get(1).getValue());
 
-                if (y1.equals(y2)) {
+//                System.out.println("Confidence: " + confidence);
+//                System.out.println("Comparing " + y1 + " and " + y2);
+
+                if (y1.get(Calendar.YEAR) == y2.get(Calendar.YEAR)) {
                     confidence += ((1 - confidence) * initConfidences.get(1));
                     sources.add(birthYears.get(1).getSourceString());
                     birthYears.remove(1);
                 } else {
-                    sources.clear();
                     if (confidence >= initConfidences.get(1)) {
                         birthYears.remove(1);
                         confidence *= (1 - initConfidences.get(1));
                     } else {
+                        sources.clear();
                         birthYears.remove(0);
                         confidence = initConfidences.get(1) * (1 - confidence);
                     }
@@ -248,17 +251,68 @@ public class Analyser {
                 initConfidences.remove(1);
             }
 
-            if (maxDate != null) sources.add(maxBDays.get(0).getSourceString());
+            if (maxFact != null) sources.add(maxFact.getSourceString());
+            if (minFact != null) sources.add(minFact.getSourceString());
 
-            String[] sourceArr = sources.toArray(new String[sources.size()]);
+            // Convert Date to String.
             Calendar c = Calendar.getInstance();
             c.setTime((Date) birthYears.get(0).getValue());
-            String year = Integer.toString(c.get(Calendar.YEAR));
-            System.out.println("Birth Year: " + year + "  Confidence: " + confidence);
+            int yearInt = c.get(Calendar.YEAR);
+            String year = Integer.toString(yearInt);
+
+            // Get sources as string array.
+            String[] sourceArr = sources.toArray(new String[sources.size()]);
+
             conclusions.add(new Conclusion("Birth Year", year, confidence, sourceArr));
+            System.out.println("Birth Year: " + year + "  Confidence: " + confidence);
+
+            c = Calendar.getInstance();
+            int maxAge = (c.get(Calendar.YEAR) - yearInt);
+            String age = (maxAge - 1) + " - " + maxAge;
+
+            conclusions.add(new Conclusion("Age", age, confidence, sourceArr));
+            System.out.println("Age: " + age + "  Confidence: " + confidence);
         }
 
         return conclusions;
+    }
+
+    private static Fact getMaxBirthDate(FactBook f) {
+        // Get the latest possible dates that could be their birth date.
+        ArrayList<Fact> maxBDays = f.getFactsWithName("Max Birth Date");
+
+        // Get the earliest of the max dates.
+        Fact maxFact = null;
+        if (!maxBDays.isEmpty()) {
+            while (maxBDays.size() > 1) {
+                Date d1 = (Date) maxBDays.get(0).getValue();
+                Date d2 = (Date) maxBDays.get(1).getValue();
+                if (d2.before(d1)) maxBDays.remove(0);
+                else maxBDays.remove(1);
+            }
+            maxFact = maxBDays.get(0);
+        }
+
+        return maxFact;
+    }
+
+    private static Fact getMinBirthDate(FactBook f) {
+        // Get the earliest possible dates that could be their birth date.
+        ArrayList<Fact> minBDays = f.getFactsWithName("Min Birth Date");
+
+        // Get the latest of the min dates.
+        Fact minFact = null;
+        if (!minBDays.isEmpty()) {
+            while (minBDays.size() > 1) {
+                Date d1 = (Date) minBDays.get(0).getValue();
+                Date d2 = (Date) minBDays.get(1).getValue();
+                if (d2.after(d1)) minBDays.remove(0);
+                else minBDays.remove(1);
+            }
+            minFact = minBDays.get(0);
+        }
+
+        return minFact;
     }
 
     private static ArrayList<Conclusion> analyseImages(FactBook f) {
