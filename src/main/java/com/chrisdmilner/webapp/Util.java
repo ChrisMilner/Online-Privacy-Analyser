@@ -75,7 +75,7 @@ public class Util {
         return file;
     }
 
-    private static String getResourceURI() {
+    public static String getResourceURI() {
         if ((new File(".").getAbsolutePath()).equals("/."))
             return System.getProperty("user.dir") + "opt/tomcat/webapps/analyserwebapp/WEB-INF/classes/";
         else
