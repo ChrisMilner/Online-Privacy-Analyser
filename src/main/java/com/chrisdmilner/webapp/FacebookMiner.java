@@ -93,8 +93,22 @@ public class FacebookMiner {
 		if (u.getAgeRange() != null) { 			fs.addFact(new Fact<>("Minimum Age", u.getAgeRange().getMin(), "Facebook", "UserProfile"));
 												fs.addFact(new Fact<>("Maximum Age", u.getAgeRange().getMax(), "Facebook", "UserProfile")); }
 		if (u.getBio() != null) 				fs.addFact(new Fact<>("Description", u.getBio(), "Facebook", "UserProfile"));
-		if (u.getBirthday() != null)			fs.addFact(new Fact<>("Birthday", u.getBirthday(), "Facebook", "UserProfile"));
-		if (u.getEmail() != null) 				fs.addFact(new Fact<>("Email", u.getEmail(), "Facebook", "UserProfile"));
+
+		if (u.getBirthday() != null) {
+            //fs.addFact(new Fact<>("Birthday", u.getBirthday(), "Facebook", "UserProfile"));
+            String bday = u.getBirthday();
+            if (bday.length() == 4) // YYYY
+                fs.addFact(new Fact<>("Birth Year", bday, "Facebook", "UserProfile"));
+            else { // MM/DD
+                String[] parts = bday.split("/");
+                fs.addFact(new Fact<>("Birth Month", parts[0], "Facebook", "UserProfile"));
+                fs.addFact(new Fact<>("Birth Day", parts[1], "Facebook", "UserProfile"));
+                if (parts.length > 2)
+                    fs.addFact(new Fact<>("Birth Year", parts[2], "Facebook", "UserProfile"));
+            }
+		}
+
+        if (u.getEmail() != null) 				fs.addFact(new Fact<>("Email", u.getEmail(), "Facebook", "UserProfile"));
 		if (u.getGender() != null) 				fs.addFact(new Fact<>("Gender", u.getGender(), "Facebook", "UserProfile"));
 		if (u.getTimezone() != null) 			fs.addFact(new Fact<>("Time Zone", u.getTimezone(), "Facebook", "UserProfile"));
 		if (u.getHometown() != null && u.getHometown().getName()!=null)
