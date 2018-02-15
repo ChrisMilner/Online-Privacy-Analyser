@@ -276,7 +276,7 @@ public class Analyser {
         } else if (maxFact != null && minFact != null) {
             double confidence = getConfidenceFromSource(maxFact.getSource(), maxFact.getSubSource());
             confidence *= getConfidenceFromSource(minFact.getSource(), minFact.getSubSource());
-            
+
             sources.add(maxFact.getSourceString());
             sources.add(minFact.getSourceString());
             String[] sourceArr = sources.toArray(new String[sources.size()]);

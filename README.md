@@ -15,7 +15,7 @@ t4j.debug=
 t4j.prettyDebug=
 t4j.oauth.consumerKey=
 t4j.oauth.consumerSecret=
-t4j.oauth.accessToken=602310612-
+t4j.oauth.accessToken=
 t4j.oauth.accessTokenSecret=
 
 jraw.clientId=
