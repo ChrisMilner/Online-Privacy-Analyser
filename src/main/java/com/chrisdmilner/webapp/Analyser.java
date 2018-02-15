@@ -274,8 +274,9 @@ public class Analyser {
             conclusions.add(new Conclusion("Age", age, confidence, sourceArr));
             System.out.println("Age: " + age + "  Confidence: " + confidence);
         } else if (maxFact != null && minFact != null) {
-            double confidence = getConfidenceFromSource(maxFact.getSubSource(), maxFact.getSubSource());
+            double confidence = getConfidenceFromSource(maxFact.getSource(), maxFact.getSubSource());
             confidence *= getConfidenceFromSource(minFact.getSource(), minFact.getSubSource());
+            
             sources.add(maxFact.getSourceString());
             sources.add(minFact.getSourceString());
             String[] sourceArr = sources.toArray(new String[sources.size()]);
@@ -297,6 +298,36 @@ public class Analyser {
             String age = (currYear - y2) + " - " + (currYear - y1);
 
             conclusions.add(new Conclusion("Age", age, confidence, sourceArr));
+            System.out.println("Age: " + age + "  Confidence: " + confidence);
+        } else if (maxFact != null) {
+            Calendar c1 = Calendar.getInstance();
+            int currYear = c1.get(Calendar.YEAR);
+
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(maxDate);
+            int maxYear = c2.get(Calendar.YEAR);
+
+            int year = currYear - maxYear;
+            String age = year + " or Over";
+
+            double confidence = getConfidenceFromSource(maxFact.getSource(), maxFact.getSubSource());
+
+            conclusions.add(new Conclusion("Age", age, confidence, new String[] {maxFact.getSourceString()}));
+            System.out.println("Age: " + age + "  Confidence: " + confidence);
+        } else if (minFact != null) {
+            Calendar c1 = Calendar.getInstance();
+            int currYear = c1.get(Calendar.YEAR);
+
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(minDate);
+            int maxYear = c2.get(Calendar.YEAR);
+
+            int year = currYear - maxYear;
+            String age = year + " or Under";
+
+            double confidence = getConfidenceFromSource(minFact.getSource(), minFact.getSubSource());
+
+            conclusions.add(new Conclusion("Age", age, confidence, new String[] {minFact.getSourceString()}));
             System.out.println("Age: " + age + "  Confidence: " + confidence);
         }
 
