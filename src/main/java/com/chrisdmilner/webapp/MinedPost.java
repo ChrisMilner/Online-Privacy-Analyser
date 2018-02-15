@@ -1,6 +1,8 @@
 package com.chrisdmilner.webapp;
 
-import twitter4j.*;
+import twitter4j.GeoLocation;
+import twitter4j.Place;
+
 import java.util.Date;
 
 public class MinedPost {

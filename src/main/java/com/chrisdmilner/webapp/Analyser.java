@@ -1,7 +1,5 @@
 package com.chrisdmilner.webapp;
 
-import facebook4j.Facebook;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -1,5 +1,7 @@
 <%@ page import="com.chrisdmilner.webapp.Util" %>
-<%@ page import="org.json.*" %>
+<%@ page import="org.json.JSONArray" %>
+<%@ page import="org.json.JSONException" %>
+<%@ page import="org.json.JSONObject" %>
 <%@ page import="java.io.FileNotFoundException" %>
 <!doctype html>
 

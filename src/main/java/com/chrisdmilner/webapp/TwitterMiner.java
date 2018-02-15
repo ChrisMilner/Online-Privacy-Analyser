@@ -2,8 +2,8 @@ package com.chrisdmilner.webapp;
 
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
+
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 

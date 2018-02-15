@@ -3,12 +3,7 @@ package com.chrisdmilner.webapp;
 import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
 
-import java.io.FileNotFoundException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 // Contains functions related to Facebook data mining.
@@ -111,7 +106,6 @@ public class FacebookMiner {
 		if (u.getBio() != null) 				fs.addFact(new Fact<>("Description", u.getBio(), "Facebook", "UserProfile"));
 
 		if (u.getBirthday() != null) {
-            //fs.addFact(new Fact<>("Birthday", u.getBirthday(), "Facebook", "UserProfile"));
             String bday = u.getBirthday();
             if (bday.length() == 4) { // YYYY
                 fs.addFact(new Fact<>("Birth Year", Util.parseDate(bday, "yyyy"), "Facebook", "UserProfile"));

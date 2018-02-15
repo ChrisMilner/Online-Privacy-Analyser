@@ -4,16 +4,12 @@ import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.OkHttpNetworkAdapter;
 import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.models.Account;
-import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.PublicContribution;
-import net.dean.jraw.models.UserHistorySort;
 import net.dean.jraw.oauth.Credentials;
 import net.dean.jraw.oauth.OAuthHelper;
 import net.dean.jraw.pagination.DefaultPaginator;
-import net.dean.jraw.references.CommentReference;
 import net.dean.jraw.references.OtherUserReference;
 
-import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
