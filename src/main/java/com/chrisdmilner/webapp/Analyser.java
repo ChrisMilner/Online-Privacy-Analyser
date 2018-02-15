@@ -13,9 +13,9 @@ public class Analyser {
         FactBook fb = new FactBook();
         fb.addFact(new Fact<>("Name", "chrism", "Twitter", "UserProfile"));
         fb.addFact(new Fact<>("Name", "Christopher David Milner", "Facebook", "UserProfile"));
-        fb.addFact(new Fact<>("Name", "ChrisDMilner97", "Twitter", "UserProfile"));
+//        fb.addFact(new Fact<>("Name", "ChrisDMilner97", "Twitter", "UserProfile"));
         fb.addFact(new Fact<>("Name", "Chris Milner", "Twitter", "UserProfile"));
-        fb.addFact(new Fact<>("Name", "Radioactive1997", "Reddit", "UserProfile"));
+//        fb.addFact(new Fact<>("Name", "Radioactive1997", "Reddit", "UserProfile"));
         fb.addFact(new Fact<>("First Name", "Christopher", "Facebook", "UserProfile"));
         fb.addFact(new Fact<>("Last Name", "Milner", "Facebook", "UserProfile"));
         fb.addFact(new Fact<>("Image URL", "http://example.com/image.png", "Facebook", "Photos"));
@@ -23,7 +23,8 @@ public class Analyser {
         try {
             DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
             fb.addFact(new Fact<>("Max Birth Date", df.parse("17/08/2005"), "Facebook", "UserProfile"));
-            fb.addFact(new Fact<>("Birth Year", df.parse("01/01/1997"), "Facebook", "UserProfile"));
+            fb.addFact(new Fact<>("Min Birth Date", df.parse("17/08/1995"), "Facebook", "UserProfile"));
+//            fb.addFact(new Fact<>("Birth Year", df.parse("01/01/1997"), "Facebook", "UserProfile"));
         } catch (ParseException e) {
             System.err.println("ERROR parsing the test date(s)");
             e.printStackTrace();
@@ -269,6 +270,31 @@ public class Analyser {
             c = Calendar.getInstance();
             int maxAge = (c.get(Calendar.YEAR) - yearInt);
             String age = (maxAge - 1) + " - " + maxAge;
+
+            conclusions.add(new Conclusion("Age", age, confidence, sourceArr));
+            System.out.println("Age: " + age + "  Confidence: " + confidence);
+        } else if (maxFact != null && minFact != null) {
+            double confidence = getConfidenceFromSource(maxFact.getSubSource(), maxFact.getSubSource());
+            confidence *= getConfidenceFromSource(minFact.getSource(), minFact.getSubSource());
+            sources.add(maxFact.getSourceString());
+            sources.add(minFact.getSourceString());
+            String[] sourceArr = sources.toArray(new String[sources.size()]);
+
+            Calendar c1 = Calendar.getInstance();
+            Calendar c2 = Calendar.getInstance();
+            c1.setTime(minDate);
+            c2.setTime(maxDate);
+            int y1 = c1.get(Calendar.YEAR);
+            int y2 = c2.get(Calendar.YEAR);
+
+            String year = (y1 - 1) + " - " + y2;
+
+            conclusions.add(new Conclusion("Birth Year", year, confidence, sourceArr));
+            System.out.println("Birth Year: " + year + "  Confidence: " + confidence);
+
+            Calendar c = Calendar.getInstance();
+            int currYear = c.get(Calendar.YEAR);
+            String age = (currYear - y2) + " - " + (currYear - y1);
 
             conclusions.add(new Conclusion("Age", age, confidence, sourceArr));
             System.out.println("Age: " + age + "  Confidence: " + confidence);
