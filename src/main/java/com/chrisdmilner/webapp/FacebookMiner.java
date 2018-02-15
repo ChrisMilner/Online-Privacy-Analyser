@@ -34,9 +34,11 @@ public class FacebookMiner {
 
 		// Get the raw Facebook API user data.
 		Facebook fb = ff.getInstance();
-		User u = null;
 
+		User u = null;
 		try {
+            fb.extendTokenExpiration();
+
             Reading reading = new Reading().fields( "about",        "address",          "age_range",
                                                     "birthday",     "cover",            "education",
                                                     "email",        "first_name",       "gender",
@@ -137,7 +139,8 @@ public class FacebookMiner {
 		cb.setOAuthAppSecret(Util.getConfigParameter(props,"f4j.oauth.appSecret="));
 
 		if (at.equals("")) {
-		    System.out.println("Not using the Access Token");
+		    System.out.println("Not using the given Access Token");
+		    System.out.println(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
 		    cb.setOAuthAccessToken(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
         } else cb.setOAuthAccessToken(at);
 
