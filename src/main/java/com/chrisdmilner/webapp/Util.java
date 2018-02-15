@@ -7,7 +7,10 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.SecureClassLoader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Util {
@@ -86,6 +89,19 @@ public class Util {
         int start = file.lastIndexOf(param) + param.length();
         if (start != -1) return file.substring(start, file.indexOf('\n', start));
         return "";
+    }
+
+    public static Date parseDate(String date, String format) {
+        Date d = null;
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy");
+            d = df.parse(date);
+        } catch (ParseException e) {
+            System.err.println("ERROR parsing a date. Not in the expected " + format + " format.");
+            e.printStackTrace();
+        }
+
+        return d;
     }
 
 }

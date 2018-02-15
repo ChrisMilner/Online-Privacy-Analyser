@@ -61,7 +61,7 @@ public class TwitterMiner {
 			}
 		}
 
-		fb.addFact(new Fact<>("Created Account", u.getCreatedAt(), "Twitter", "UserProfile"));
+		fb.addFact(new Fact<>("Max Birth Date", u.getCreatedAt(), "Twitter", "UserProfile"));
 		fb.addFact(new Fact<>("Language", u.getLang(), "Twitter", "UserProfile"));
 		fb.addFact(new Fact<>("Location", u.getLocation(), "Twitter", "UserProfile"));
 		fb.addFact(new Fact<>("Time Zone", u.getTimeZone(), "Twitter", "UserProfile"));

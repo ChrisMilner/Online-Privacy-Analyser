@@ -4,7 +4,11 @@ import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
 
 import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 // Contains functions related to Facebook data mining.
@@ -90,21 +94,33 @@ public class FacebookMiner {
 		if (u.getUsername() != null) 			fs.addFact(new Fact<>("Username", u.getUsername(), "Facebook", "UserProfile"));
 		if (u.getPicture() != null && !u.getPicture().isSilhouette())
 		                                        fs.addFact(new Fact<>("Image URL", u.getPicture().getURL().toString(), "Facebook", "UserProfile"));
-		if (u.getAgeRange() != null) { 			fs.addFact(new Fact<>("Minimum Age", u.getAgeRange().getMin(), "Facebook", "UserProfile"));
-												fs.addFact(new Fact<>("Maximum Age", u.getAgeRange().getMax(), "Facebook", "UserProfile")); }
+		if (u.getAgeRange() != null) {
+		    // Get current date.
+            Calendar max = Calendar.getInstance();
+            Calendar min = Calendar.getInstance();
+
+            // Subtract the ages
+            max.add(Calendar.YEAR, -u.getAgeRange().getMin());
+            min.add(Calendar.YEAR, - u.getAgeRange().getMax());
+
+            // Parse the dates into facts.
+            fs.addFact(new Fact<>("Max Birth Date", max.getTime(), "Facebook", "UserProfile"));
+		    fs.addFact(new Fact<>("Min Birth Date", min.getTime(), "Facebook", "UserProfile"));
+		}
+
 		if (u.getBio() != null) 				fs.addFact(new Fact<>("Description", u.getBio(), "Facebook", "UserProfile"));
 
 		if (u.getBirthday() != null) {
             //fs.addFact(new Fact<>("Birthday", u.getBirthday(), "Facebook", "UserProfile"));
             String bday = u.getBirthday();
-            if (bday.length() == 4) // YYYY
-                fs.addFact(new Fact<>("Birth Year", bday, "Facebook", "UserProfile"));
-            else { // MM/DD
+            if (bday.length() == 4) { // YYYY
+                fs.addFact(new Fact<>("Birth Year", Util.parseDate(bday, "yyyy"), "Facebook", "UserProfile"));
+            } else { // MM/DD
                 String[] parts = bday.split("/");
                 fs.addFact(new Fact<>("Birth Month", parts[0], "Facebook", "UserProfile"));
                 fs.addFact(new Fact<>("Birth Day", parts[1], "Facebook", "UserProfile"));
                 if (parts.length > 2)
-                    fs.addFact(new Fact<>("Birth Year", parts[2], "Facebook", "UserProfile"));
+                    fs.addFact(new Fact<>("Birth Year", Util.parseDate(parts[2], "yyyy"), "Facebook", "UserProfile"));
             }
 		}
 

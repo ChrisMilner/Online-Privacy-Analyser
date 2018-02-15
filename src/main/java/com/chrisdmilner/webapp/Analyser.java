@@ -22,7 +22,7 @@ public class Analyser {
 
         try {
             DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
-            fb.addFact(new Fact<>("Created Account", df.parse("17/08/2005"), "Facebook", "UserProfile"));
+            fb.addFact(new Fact<>("Max Birth Date", df.parse("17/08/2005"), "Facebook", "UserProfile"));
         } catch (ParseException e) {
             System.err.println("ERROR parsing the test date(s)");
             e.printStackTrace();
@@ -192,65 +192,69 @@ public class Analyser {
     private static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
-        ArrayList<Fact> createdDates = f.getFactsWithName("Created Account");
+        // Get the latest possible dates that could be their birth date.
+        ArrayList<Fact> maxBDays = f.getFactsWithName("Max Birth Date");
         HashSet<String> sources = new HashSet<>();
+
+        // Get the earliest of the max dates.
         Date maxDate = null;
-
-        if (!createdDates.isEmpty()) {
-            while (createdDates.size() > 1) {
-                Date d1 = (Date) createdDates.get(0).getValue();
-                Date d2 = (Date) createdDates.get(1).getValue();
-                if (d2.before(d1)) createdDates.remove(0);
-                else createdDates.remove(1);
+        if (!maxBDays.isEmpty()) {
+            while (maxBDays.size() > 1) {
+                Date d1 = (Date) maxBDays.get(0).getValue();
+                Date d2 = (Date) maxBDays.get(1).getValue();
+                if (d2.before(d1)) maxBDays.remove(0);
+                else maxBDays.remove(1);
             }
-            maxDate = (Date) createdDates.get(0).getValue();
+            maxDate = (Date) maxBDays.get(0).getValue();
         }
 
-        ArrayList<Fact> birthDates = f.getFactsWithName("Birth Year");
+        ArrayList<Fact> birthYears = f.getFactsWithName("Birth Year");
 
+        // Ignore all possible birth years if they occur after the max date.
         if (maxDate != null) {
-            for (int i = birthDates.size() - 1; i >= 0; i--)
-                if (((Date) birthDates.get(i).getValue()).after(maxDate)) birthDates.remove(i);
+            for (int i = birthYears.size() - 1; i >= 0; i--)
+                if (((Date) birthYears.get(i).getValue()).after(maxDate)) birthYears.remove(i);
         }
 
-        if (!birthDates.isEmpty()) {
+        // Combine the remaining birth years to get a final answer.
+        if (!birthYears.isEmpty()) {
 
             ArrayList<Double> initConfidences = new ArrayList<>();
-            for (int i = 0; i < birthDates.size(); i++)
-                initConfidences.add(getConfidenceFromSource(birthDates.get(i).getSource(), birthDates.get(i).getSubSource()));
+            for (int i = 0; i < birthYears.size(); i++)
+                initConfidences.add(getConfidenceFromSource(birthYears.get(i).getSource(), birthYears.get(i).getSubSource()));
 
             double confidence = initConfidences.get(0);
 
-            sources.add(birthDates.get(0).getSourceString());
+            sources.add(birthYears.get(0).getSourceString());
 
-            while (birthDates.size() > 1) {
-                Date y1 = (Date) birthDates.get(0).getValue();
-                Date y2 = (Date) birthDates.get(1).getValue();
+            while (birthYears.size() > 1) {
+                Date y1 = (Date) birthYears.get(0).getValue();
+                Date y2 = (Date) birthYears.get(1).getValue();
 
                 if (y1.equals(y2)) {
                     confidence += ((1 - confidence) * initConfidences.get(1));
-                    sources.add(birthDates.get(1).getSourceString());
-                    birthDates.remove(1);
+                    sources.add(birthYears.get(1).getSourceString());
+                    birthYears.remove(1);
                 } else {
                     sources.clear();
                     if (confidence >= initConfidences.get(1)) {
-                        birthDates.remove(1);
+                        birthYears.remove(1);
                         confidence *= (1 - initConfidences.get(1));
                     } else {
-                        birthDates.remove(0);
+                        birthYears.remove(0);
                         confidence = initConfidences.get(1) * (1 - confidence);
                     }
-                    sources.add(birthDates.get(0).getSourceString());
+                    sources.add(birthYears.get(0).getSourceString());
                 }
 
                 initConfidences.remove(1);
             }
 
-            if (maxDate != null) sources.add(createdDates.get(0).getSourceString());
+            if (maxDate != null) sources.add(maxBDays.get(0).getSourceString());
 
             String[] sourceArr = sources.toArray(new String[sources.size()]);
             Calendar c = Calendar.getInstance();
-            c.setTime((Date) birthDates.get(0).getValue());
+            c.setTime((Date) birthYears.get(0).getValue());
             String year = Integer.toString(c.get(Calendar.YEAR));
             System.out.println("Birth Year: " + year + "  Confidence: " + confidence);
             conclusions.add(new Conclusion("Birth Year", year, confidence, sourceArr));
