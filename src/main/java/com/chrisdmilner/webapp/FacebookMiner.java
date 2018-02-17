@@ -9,17 +9,6 @@ import java.util.List;
 // Contains functions related to Facebook data mining.
 public class FacebookMiner {
 
-	// FOR TEST USE
-	public static void main(String[] args) {
-		if (args.length != 2) {
-			System.err.println("ERROR incorrect number of arguments. You must give two arguments: a Facebook id and an access token or ''.");
-			System.exit(1);
-		}
-
-		FactBook fb = mine(args[0], args[1]);
-		System.out.println(fb.toString());
-	}
-
 	// Extracts the available Facebook data for a given user ID.
 	public static FactBook mine(String id, String at) {
 

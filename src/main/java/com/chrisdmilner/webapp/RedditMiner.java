@@ -16,19 +16,6 @@ import java.util.UUID;
 
 public class RedditMiner {
 
-	// FOR TEST USE
-	public static void main(String[] args) {
-		if (args.length != 1) {
-			System.err.println("ERROR incorrect number of arguments. You must give one argument: a Reddit username.");
-			System.exit(1);
-		}
-
-		FactBook fb = mine(args[0]);
-
-		System.out.println(fb.toString());
-	}
-
-
 	public static FactBook mine(String name) {
 
 	    System.out.println("\n - STARTING REDDIT MINER - \n");

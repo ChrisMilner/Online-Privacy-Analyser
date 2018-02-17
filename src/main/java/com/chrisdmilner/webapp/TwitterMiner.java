@@ -10,16 +10,6 @@ import java.util.concurrent.TimeUnit;
 // Contains functions related to Twitter data mining.
 public class TwitterMiner {
 
-	// FOR TEST USE
-	public static void main(String[] args) {
-		if (args.length != 1) {
-			System.err.println("ERROR incorrect number of arguments. You must give one argument: a Twitter handle.");
-			System.exit(1);
-		}
-
-		mine(args[0]);
-	}
-
 	private final static int MAX_FOLLOWER_COUNT = 10000; 	// The number of followers the user can have before they will not be processed.
 	private final static int MAX_FRIEND_COUNT = 10000;		// The number of users the user can be following before they will not be processed.
 

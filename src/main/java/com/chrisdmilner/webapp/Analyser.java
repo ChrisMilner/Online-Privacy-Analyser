@@ -1,7 +1,5 @@
 package com.chrisdmilner.webapp;
 
-import facebook4j.Facebook;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,29 +7,20 @@ import java.util.*;
 
 public class Analyser {
 
-    public static void main(String[] args) {
-        FactBook fb = new FactBook();
-        fb.addFact(new Fact<>("Name", "chrism", "Twitter", "UserProfile"));
-        fb.addFact(new Fact<>("Name", "Christopher David Milner", "Facebook", "UserProfile"));
-//        fb.addFact(new Fact<>("Name", "ChrisDMilner97", "Twitter", "UserProfile"));
-        fb.addFact(new Fact<>("Name", "Chris Milner", "Twitter", "UserProfile"));
-//        fb.addFact(new Fact<>("Name", "Radioactive1997", "Reddit", "UserProfile"));
-        fb.addFact(new Fact<>("First Name", "Christopher", "Facebook", "UserProfile"));
-        fb.addFact(new Fact<>("Last Name", "Milner", "Facebook", "UserProfile"));
-        fb.addFact(new Fact<>("Image URL", "http://example.com/image.png", "Facebook", "Photos"));
-
-        try {
-            DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
-            fb.addFact(new Fact<>("Max Birth Date", df.parse("17/08/2005"), "Facebook", "UserProfile"));
-            fb.addFact(new Fact<>("Min Birth Date", df.parse("17/08/1995"), "Facebook", "UserProfile"));
-//            fb.addFact(new Fact<>("Birth Year", df.parse("01/01/1997"), "Facebook", "UserProfile"));
-        } catch (ParseException e) {
-            System.err.println("ERROR parsing the test date(s)");
-            e.printStackTrace();
-        }
-
-        analyse(fb);
-    }
+    // TODO:
+    //  - Education
+    //  - Text Posts
+    //  - Locations
+    //  - Email(s)
+    //  - Gender
+    //  - Interests
+    //  - Politics
+    //  - Religion
+    //  - Sexuality
+    //  - Partner
+    //  - Jobs
+    //  - Lanuages
+    //  - Friends
 
     public static ArrayList<Conclusion> analyse(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
