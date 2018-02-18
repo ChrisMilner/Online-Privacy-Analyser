@@ -152,8 +152,8 @@ public class FacebookMiner {
 		cb.setOAuthAppSecret(Util.getConfigParameter(props,"f4j.oauth.appSecret="));
 
 		if (at.equals("")) {
-		    System.out.println("Not using the given Access Token");
-		    System.out.println(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
+		    System.out.println("   Not using the given Access Token");
+//		    System.out.println(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
 		    cb.setOAuthAccessToken(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
         } else cb.setOAuthAccessToken(at);
 
