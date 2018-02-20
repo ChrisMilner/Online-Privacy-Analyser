@@ -3,6 +3,7 @@ package com.chrisdmilner.webapp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -34,6 +35,10 @@ public class AnalyserTest {
             e.printStackTrace();
         }
 
-        assertTrue(Analyser.analyse(fb).size() > 0);
+        ArrayList<Conclusion> conclusions = Analyser.analyse(fb);
+        assertTrue(conclusions.size() > 0);
+
+        for (Conclusion c : conclusions)
+            System.out.println(c.toString());
     }
 }

@@ -29,11 +29,20 @@ public class Fact<T> {
 		String out = "";
 
 		if (value instanceof String) {
-			out = name + ": " + value + "\t" + source.toString();
+			out = name + ": " + value;
 		} else {
-			out = name + ": (Object) " + value.toString() + "\t" + source.toString();
+			out = name + ": (Object) " + value.toString();
 		}
+
+		if (source != null) {
+			out += " <- " + source.toString();
+		}
+
 		return out;
 	}
+
+	public String toJSON() {
+	    return "{\"name\":\"" + name + "\", \"value\":\"" + value.toString() + "\", \"source\":" + source.toJSON() + "}";
+    }
 
 }

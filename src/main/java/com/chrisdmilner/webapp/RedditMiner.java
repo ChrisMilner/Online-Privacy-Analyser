@@ -45,6 +45,7 @@ public class RedditMiner {
         HashSet<String> subreddits = new HashSet<>();
         List<PublicContribution<?>> comments = commentPaginator.accumulateMerged(-1);
         MinedPost curr;
+
         for (PublicContribution<?> comment : comments) {
             curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody());
             fb.addFact(new Fact<>("Commented", curr, rootFact));

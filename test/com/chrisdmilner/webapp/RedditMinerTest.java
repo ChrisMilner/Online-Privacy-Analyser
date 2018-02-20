@@ -8,6 +8,8 @@ public class RedditMinerTest {
 
     @Test
     public void mine() {
-        assertTrue(RedditMiner.mine("RadioactiveMonkey").noOfFacts() > 0);
+        FactBook f = RedditMiner.mine("RadioactiveMonkey123");
+        assertTrue(f.noOfFacts() > 0);
+        System.out.println(f.toString());
     }
 }

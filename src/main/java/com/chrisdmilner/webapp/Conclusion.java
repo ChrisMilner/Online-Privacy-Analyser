@@ -33,12 +33,21 @@ public class Conclusion {
 		return sources;
 	}
 
-	// Converts the conclusion to a JSON format.
 	public String toString() {
+		String out = name + " : " + value + " (" + confidence + ")\n";
+
+        for (Fact f : sources)
+            out += "   " + f.toString() + "\n";
+
+		return out;
+	}
+
+	// Converts the conclusion to a JSON format.
+	public String toJSON() {
 		String out = "{\"name\":\"" + name + "\", \"value\":\"" + value + "\", \"confidence\":" + confidence + ", \"sources\":[";
 		
 		for (int i = 0; i < sources.size(); i++) {
-			out += "\"" + sources.get(i) +"\"";
+			out += "\"" + sources.get(i).toJSON() +"\"";
 			if (i < sources.size() - 1) out += ", ";
 		}
 		out += "]}";

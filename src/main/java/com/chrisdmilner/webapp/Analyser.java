@@ -29,13 +29,17 @@ public class Analyser {
 
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
+        System.out.println("   Breaking down Name Parts");
         analyseName(f);
 
+        System.out.println("   Analysing the Name Parts");
         conclusions.addAll(analyseNameParts(f));
-        conclusions.addAll(analyseBirthDate(f));
-        conclusions.addAll(analyseImages(f));
 
-        System.out.println("   Number of conclusions: " + conclusions.size());
+        System.out.println("   Analysing Birth Dates");
+        conclusions.addAll(analyseBirthDate(f));
+
+        System.out.println("   Analysing Images");
+        conclusions.addAll(analyseImages(f));
 
         System.out.println("\n - ANALYSER FINISHED - \n");
 
@@ -181,7 +185,7 @@ public class Analyser {
             }
         }
 
-        System.out.println("   " + namePart + ": " + part.get(0).getValue() + "  Confidence: " + confidence);
+//        System.out.println("   " + namePart + ": " + part.get(0).getValue() + "  Confidence: " + confidence);
         return new Conclusion(namePart, candidateName, confidence, sources);
     }
 
@@ -260,14 +264,14 @@ public class Analyser {
             String year = Integer.toString(yearInt);
 
             conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
-            System.out.println("   Birth Year: " + year + "  Confidence: " + confidence);
+//            System.out.println("   Birth Year: " + year + "  Confidence: " + confidence);
 
             c = Calendar.getInstance();
             int maxAge = (c.get(Calendar.YEAR) - yearInt);
             String age = (maxAge - 1) + " - " + maxAge;
 
             conclusions.add(new Conclusion("Age", age, confidence, sources));
-            System.out.println("   Age: " + age + "  Confidence: " + confidence);
+//            System.out.println("   Age: " + age + "  Confidence: " + confidence);
         } else if (maxFact != null && minFact != null) {
             double confidence = getConfidenceFromSource(maxFact.getSource());
             confidence *= getConfidenceFromSource(minFact.getSource());
@@ -285,14 +289,14 @@ public class Analyser {
             String year = (y1 - 1) + " - " + y2;
 
             conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
-            System.out.println("   Birth Year: " + year + "  Confidence: " + confidence);
+//            System.out.println("   Birth Year: " + year + "  Confidence: " + confidence);
 
             Calendar c = Calendar.getInstance();
             int currYear = c.get(Calendar.YEAR);
             String age = (currYear - y2) + " - " + (currYear - y1);
 
             conclusions.add(new Conclusion("Age", age, confidence, sources));
-            System.out.println("   Age: " + age + "  Confidence: " + confidence);
+//            System.out.println("   Age: " + age + "  Confidence: " + confidence);
         } else if (maxFact != null) {
             Calendar c1 = Calendar.getInstance();
             int currYear = c1.get(Calendar.YEAR);
@@ -308,7 +312,7 @@ public class Analyser {
 
             sources.add(maxFact);
             conclusions.add(new Conclusion("Age", age, confidence, sources));
-            System.out.println("   Age: " + age + "  Confidence: " + confidence);
+//            System.out.println("   Age: " + age + "  Confidence: " + confidence);
         } else if (minFact != null) {
             Calendar c1 = Calendar.getInstance();
             int currYear = c1.get(Calendar.YEAR);
@@ -324,7 +328,7 @@ public class Analyser {
 
             sources.add(minFact);
             conclusions.add(new Conclusion("Age", age, confidence, sources));
-            System.out.println("   Age: " + age + "  Confidence: " + confidence);
+//            System.out.println("   Age: " + age + "  Confidence: " + confidence);
         }
 
         return conclusions;

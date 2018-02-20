@@ -8,6 +8,8 @@ public class TwitterMinerTest {
 
     @Test
     public void mine() {
-        assertTrue(TwitterMiner.mine("ChrisDMilner").noOfFacts() > 0);
+        FactBook f = TwitterMiner.mine("ChrisDMilner");
+        assertTrue(f.noOfFacts() > 0);
+        System.out.println(f.toString());
     }
 }
