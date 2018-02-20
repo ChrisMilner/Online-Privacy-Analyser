@@ -5,15 +5,6 @@ import java.util.ArrayList;
 // Contains functions related to general data mining
 public class Miner {
 
-	public static void main(String[] args) {
-		if (args.length != 3) {
-			System.err.println("ERROR incorrect number of arguments. You must give three argument: a Facebook, Twitter and Reddit URL.");
-			System.exit(1);
-		}
-
-		mine(args[0],args[1],args[2], "");
-	}
-
 	// Controls all of the mining function, passes data to the anaalyser and outputs conclusions to a file.
 	public static String mine(String fb, String tw, String rd, String at) {
 
@@ -55,12 +46,12 @@ public class Miner {
 		// writeConclusionsToFile(id, conclusions);
 	}
 
-	private static String conclusionsToJSON(ArrayList<Conclusion> c) {
+	protected static String conclusionsToJSON(ArrayList<Conclusion> c) {
         String json = "";
 
 	    json += "{\"conclusions\":[";
         for (int i = 0; i < c.size(); i++) {
-            json += c.get(i).toString();
+            json += c.get(i).toJSON();
             if (i < c.size() - 1) json += ",";
         }
         json += "]}";
@@ -70,12 +61,12 @@ public class Miner {
 
 	// Writes a list of conclusions into a file in JSON format.
 	private static void writeConclusionsToFile(int id, ArrayList<Conclusion> c) {
-		ArrayList<String> lines = new ArrayList<String>();
+		ArrayList<String> lines = new ArrayList<>();
 		
 		// Create the JSON files lines.
 		lines.add("{\"conclusions\":[");
 		for (int i = 0; i < c.size(); i++) {
-			lines.add(c.get(i).toString());
+			lines.add(c.get(i).toJSON());
 			if (i < c.size() - 1) lines.set(i, lines.get(i) + ",");
 		}
 		lines.add("]}");

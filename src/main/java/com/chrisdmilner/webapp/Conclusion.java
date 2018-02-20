@@ -47,7 +47,7 @@ public class Conclusion {
 		String out = "{\"name\":\"" + name + "\", \"value\":\"" + value + "\", \"confidence\":" + confidence + ", \"sources\":[";
 		
 		for (int i = 0; i < sources.size(); i++) {
-			out += "\"" + sources.get(i).toJSON() +"\"";
+			out += sources.get(i).toJSON();
 			if (i < sources.size() - 1) out += ", ";
 		}
 		out += "]}";

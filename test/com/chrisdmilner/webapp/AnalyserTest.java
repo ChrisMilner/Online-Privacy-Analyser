@@ -1,5 +1,8 @@
 package com.chrisdmilner.webapp;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,7 +13,7 @@ import static org.junit.Assert.*;
 public class AnalyserTest {
 
     @org.junit.Test
-    public void analyse() {
+    public void analyse() throws Exception {
         Fact fbRoot = new Fact<>("Facebook User ID", "100008177116719", null);
         Fact twRoot = new Fact<>("Twitter Handle", "ChrisDMilner", null);
         Fact rdRoot = new Fact<>("Reddit User Name", "Radioactive1997", null);
@@ -40,5 +43,11 @@ public class AnalyserTest {
 
         for (Conclusion c : conclusions)
             System.out.println(c.toString());
+
+        // Test if the generated JSON is valid.
+        String json = Miner.conclusionsToJSON(conclusions);
+        System.out.println(json);
+
+        new JSONObject(json);
     }
 }

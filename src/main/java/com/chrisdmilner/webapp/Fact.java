@@ -42,7 +42,13 @@ public class Fact<T> {
 	}
 
 	public String toJSON() {
-	    return "{\"name\":\"" + name + "\", \"value\":\"" + value.toString() + "\", \"source\":" + source.toJSON() + "}";
-    }
+	    String out = "{\"name\":\"" + name + "\", \"value\":\"" + value.toString() + "\", \"source\":";
+
+	    if (source != null) out += source.toJSON();
+	    else out += "{}";
+
+	    out += "}";
+	    return out;
+	}
 
 }
