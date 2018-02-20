@@ -1,5 +1,6 @@
 package com.chrisdmilner.webapp;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,44 +51,54 @@ public class Analyser {
         ArrayList<Fact> names = fb.getFactsWithName("Name");
 
         for (Fact name : names) {
-            String value = (String) name.getValue();
-            String[] tokens;
+            String[] tokens = tokeniseName(name);
+            addNameTokens(fb, tokens, name);
+            findBirthYear(fb, name);
+        }
+    }
 
-            // Divide by spaces
-            if (value.contains(" ")) {
-                tokens = value.split("\\s+");
-                addNameTokens(fb, tokens, name);
+    private static String[] tokeniseName(Fact<String> name) {
+        String value = (String) name.getValue();
+        ArrayList<String> tokens = new ArrayList<>();
+
+        // Divide by spaces
+        if (value.contains(" ")) {
+            tokens.addAll(Arrays.asList(value.split("\\s+")));
+        } else {
+            // Divide by punctuation
+            if (value.split("[_.-]").length > 1) {
+                tokens.addAll(Arrays.asList(value.split("[_.-]")));
             } else {
-                // Divide by punctuation
-                tokens = value.split("[_.-]");
-                if (tokens.length > 1)
-                    addNameTokens(fb, tokens, name);
-                else {
-                    // Divide by capitals
-                    tokens = value.split("(?=\\p{Upper})");
-                    if (tokens.length > 1) addNameTokens(fb, tokens, name);
-                    else fb.addFact(new Fact<>("First Name", removeNonLetters(value), name));
-                }
+                // Divide by capitals
+                tokens.addAll(Arrays.asList(value.split("(?=\\p{Upper})")));
             }
+        }
 
-            String[] nums = value.split("[^0-9]");
-            DateFormat df = new SimpleDateFormat("yyyy");
-            for (String num : nums) {
-                if (num.length() == 0) continue;
+        for (String token : tokens) {
+            if (token.equals("")) tokens.remove(token);
+        }
 
-                int intnum = Integer.parseInt(num);
-                try {
-                    if (num.length() == 2) {
-                        if (intnum > (CURRENT_YEAR - 2000))
-                            fb.addFact(new Fact<>("Birth Year", df.parse("19" + num), name));
-                        else
-                            fb.addFact(new Fact<>("Birth Year", df.parse("20" + num), name));
-                    } else if (num.length() == 4 && intnum > 1900 && intnum <= CURRENT_YEAR)
-                        fb.addFact(new Fact<>("Birth Year", df.parse(num), name));
-                } catch (ParseException e) {
-                    System.err.println("ERROR converting date to correct format: yyyy");
-                    e.printStackTrace();
-                }
+        return tokens.toArray(new String[tokens.size()]);
+    }
+
+    private static void findBirthYear(FactBook fb, Fact<String> name) {
+        String[] nums = name.getValue().split("[^0-9]");
+        DateFormat df = new SimpleDateFormat("yyyy");
+        for (String num : nums) {
+            if (num.length() == 0) continue;
+
+            int intnum = Integer.parseInt(num);
+            try {
+                if (num.length() == 2) {
+                    if (intnum > (CURRENT_YEAR - 2000))
+                        fb.addFact(new Fact<>("Birth Year", df.parse("19" + num), name));
+                    else
+                        fb.addFact(new Fact<>("Birth Year", df.parse("20" + num), name));
+                } else if (num.length() == 4 && intnum > 1900 && intnum <= CURRENT_YEAR)
+                    fb.addFact(new Fact<>("Birth Year", df.parse(num), name));
+            } catch (ParseException e) {
+                System.err.println("ERROR converting date to correct format: yyyy");
+                e.printStackTrace();
             }
         }
     }
@@ -98,6 +109,9 @@ public class Analyser {
         }
 
         fb.addFact(new Fact<>("First Name", tokens[0], source));
+
+        if (tokens.length == 1) return;
+
         fb.addFact(new Fact<>("Last Name", tokens[tokens.length - 1], source));
 
         if (tokens.length > 2) {
@@ -121,72 +135,118 @@ public class Analyser {
     }
 
     private static Conclusion analyseNamePart(FactBook f, String namePart) {
-        double confidence;
-        ArrayList<Fact> sources = new ArrayList<>();
+        System.out.println("\nAnalysing " + namePart);
 
-        ArrayList<Fact> part = f.getFactsWithName(namePart);
+        // Get the facts for the given name part.
+        ArrayList<Fact> names = f.getFactsWithName(namePart);
+        if (names.isEmpty()) return null;
 
-        if (part.isEmpty()) return null;
+        // Add the initial source fact to the first conclusion candidate.
+        ArrayList<ArrayList> sources = new ArrayList<>();
+        sources.add(new ArrayList<Fact>());
+        sources.get(0).add(names.get(0));
 
-        ArrayList<Double> initConfidences = new ArrayList<Double>();
-        for (int i = 0; i < part.size(); i++)
-            initConfidences.add(getConfidenceFromSource(part.get(i).getSource()));
+        int i = 1;
+        boolean similar;
+        while (i < names.size()) {
+            System.out.println("Comparing new name " + names.get(i).getValue());
+            similar = false;
+            for (int j = 0; j < i; j++) {
+                System.out.println("Comparing with " + names.get(j).getValue());
 
-        // Sorts the facts by their confidence.
-        Collections.sort(part, Comparator.comparing(item -> initConfidences.get(part.indexOf(item))));
-        Collections.reverse(part);
-        initConfidences.sort(Comparator.reverseOrder());
+                String name1 = (String) names.get(i).getValue();
+                String name2 = (String) names.get(j).getValue();
 
-        confidence = initConfidences.get(0);
-        sources.add(part.get(0));
-
-        if (part.size() > 1) {
-            String val1, val2;
-            while (part.size() != 1) {
-                val1 = ((String) part.get(0).getValue()).toLowerCase();
-                val2 = ((String) part.get(1).getValue()).toLowerCase();
-
-//                    System.out.println("   Comparing " + val1 + " and " + val2);
-
-                if (val1.equals(val2) || val1.contains(val2) || val2.contains(val1)) {
-                    sources.add(part.get(1));
-                    part.remove(1);
-                    if (confidence >= initConfidences.get(1))
-                        confidence += ((1 - confidence) * initConfidences.get(1));
-                    else
-                        confidence = initConfidences.get(1) + ((1- initConfidences.get(1)) * confidence);
-                } else {
-                    if (confidence >= initConfidences.get(1)) {
-                        part.remove(1);
-                        confidence *= (1 - initConfidences.get(1));
+                if (name1.equals(name2)) {
+                    sources.get(j).add(names.get(i));
+                    names.remove(i);
+                    similar = true;
+                    break;
+                } else if (name1.contains(name2)) {
+                    similar = true;
+                    boolean decision = decideBetweenNames(namePart, name1, name2);
+                    if (decision) {
+                        sources.remove(j);
+                        sources.add(new ArrayList<Fact>());
+                        sources.get(i-1).add(names.get(i));
+                        names.remove(j);
                     } else {
-                        part.remove(0);
-                        confidence = initConfidences.get(1) * (1 - confidence);
-                        sources.clear();
-                        sources.add(part.get(0));
+                        sources.get(j).add(names.get(i));
+                        names.remove(i);
                     }
+                    break;
+                } else if (name2.contains(name1)) {
+                    similar = true;
+                    boolean decision = decideBetweenNames(namePart, name2, name1);
+                    if (decision) {
+                        sources.get(j).add(names.get(i));
+                        names.remove(i);
+                    } else {
+                        sources.remove(j);
+                        sources.add(new ArrayList<Fact>());
+                        sources.get(i-1).add(names.get(i));
+                        names.remove(j);
+                    }
+                    break;
                 }
+            }
 
-                if (part.size() > 1) initConfidences.remove(1);
+            if (!similar) {
+                sources.add(new ArrayList<Fact>());
+                sources.get(i).add(names.get(i));
+                i++;
             }
         }
 
+        double[] confidences = new double[names.size()];
+        double conf;
+        double totalConf = 0;
+        for (int j = 0; j < confidences.length; j++) {
+            conf = 0;
+            for (Fact fact : (ArrayList<Fact>) sources.get(j)) {
+                conf += getConfidenceFromSource(fact);
+            }
+            totalConf += conf;
+            confidences[j] = conf;
+        }
+
+        // Divide a confidence of 1 between all the options.
+        double greatestConf = 0;
+        int greatestIndex = -1;
+        for (int j = 0; j < confidences.length; j++) {
+            confidences[j] = confidences[j] / totalConf;
+            if (confidences[j] > greatestConf) {
+                greatestConf = confidences[j];
+                greatestIndex = j;
+            }
+        }
+
+        return new Conclusion(namePart, (String) names.get(greatestIndex).getValue(), greatestConf, sources.get(greatestIndex));
+    }
+
+    private static boolean decideBetweenNames(String namePart, String n1, String n2) {
+        boolean n1Recognised = isNameRecognised(namePart, n1);
+        boolean n2Recognised = isNameRecognised(namePart, n2);
+
+        // If both are recognisable or both unrecognisable then take the first one (the larger).
+        if ((!n1Recognised && !n2Recognised) || (n1Recognised && n2Recognised)) return true;
+        // If the smaller is the only recognisable one take the smaller. Otherwise take the larger.
+        else return n1Recognised;
+    }
+
+    private static boolean isNameRecognised(String namePart, String potentialName) {
         ArrayList<String> names;
         if (namePart.equals("Last Name"))
             names = Util.readResourceFileLines("data/lastnames.csv");
         else
             names = Util.readResourceFileLines("data/firstnames.csv");
 
-        String candidateName = (String) part.get(0).getValue();
         for (String name : names) {
-            if (candidateName.equals(name)) {
-                confidence += ((1 - confidence) * 0.8);
-                break;
+            if (potentialName.equals(name)) {
+                return true;
             }
         }
-
-//        System.out.println("   " + namePart + ": " + part.get(0).getValue() + "  Confidence: " + confidence);
-        return new Conclusion(namePart, candidateName, confidence, sources);
+        return false;
     }
 
     private static String removeNonLetters(String s) {
