@@ -21,6 +21,8 @@ public class RedditMiner {
 	    System.out.println("\n - STARTING REDDIT MINER - \n");
 
 		FactBook fb = new FactBook();
+		Fact rootFact = new Fact<>("Reddit User Name", name, null);
+		fb.addFact(rootFact);
 
 		System.out.println("   Connecting to API and retrieving user data");
 
@@ -34,8 +36,8 @@ public class RedditMiner {
 
 		System.out.println("   Processing the user's profile data");
 
-		fb.addFact(new Fact<>("Name", name, "Reddit", "UserProfile"));
-		fb.addFact(new Fact<>("Max Birth Date", account.getCreated(), "Reddit", "UserProfile"));
+		fb.addFact(new Fact<>("Name", name, rootFact));
+		fb.addFact(new Fact<>("Max Birth Date", account.getCreated(), rootFact));
 
         System.out.println("   Processing the user's comments");
 		DefaultPaginator<PublicContribution<?>> commentPaginator = user.history("comments").build();
@@ -45,7 +47,7 @@ public class RedditMiner {
         MinedPost curr;
         for (PublicContribution<?> comment : comments) {
             curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody());
-            fb.addFact(new Fact<>("Commented", curr, "Reddit", "CommentHistory"));
+            fb.addFact(new Fact<>("Commented", curr, rootFact));
             subreddits.add(comment.getSubreddit());
         }
 
@@ -55,14 +57,14 @@ public class RedditMiner {
         List<PublicContribution<?>> posts = postPaginator.accumulateMerged(-1);
         for (PublicContribution<?> post: posts) {
             curr = new MinedPost(post.getCreated(), null, null, null, post.getBody());
-            fb.addFact(new Fact<>("Posted", curr, "Reddit", "PostHistory"));
+            fb.addFact(new Fact<>("Posted", curr, rootFact));
             subreddits.add(post.getSubreddit());
         }
 
         System.out.println("   Processing the user's subreddits");
 
         for (String subreddit : subreddits)
-            fb.addFact(new Fact<>("Interest", subreddit, "Reddit", "Subreddits"));
+            fb.addFact(new Fact<>("Interest", subreddit, rootFact));
 
         System.out.println("\n - REDDIT MINER FINISHED - \n");
 

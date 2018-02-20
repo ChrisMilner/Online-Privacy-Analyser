@@ -19,6 +19,8 @@ public class TwitterMiner {
         System.out.println("\n - STARTING TWITTER MINER - \n");
 
 		FactBook fb = new FactBook();
+		Fact rootFact = new Fact<>("Twitter Handle", screenName, null);
+		fb.addFact(rootFact);
 
 		System.out.println("   Connecting to API and retrieving user data");
 
@@ -39,23 +41,23 @@ public class TwitterMiner {
 		System.out.println("   Processing the user's data");
 
 		// Add the available facts from the user profile to the factbook.
-		fb.addFact(new Fact<>("Name", u.getScreenName(), "Twitter", "UserProfile"));
-		fb.addFact(new Fact<>("Name", u.getName(), "Twitter", "UserProfile"));
-		if (!u.isDefaultProfileImage()) fb.addFact(new Fact<String>("Image URL", u.getOriginalProfileImageURL(), "Twitter", "UserProfile"));
-		if (!u.getDescription().equals("")) fb.addFact(new Fact<String>("Description", u.getDescription(), "Twitter", "UserProfile"));
+		fb.addFact(new Fact<>("Name", u.getScreenName(), rootFact));
+		fb.addFact(new Fact<>("Name", u.getName(), rootFact));
+		if (!u.isDefaultProfileImage()) fb.addFact(new Fact<>("Image URL", u.getOriginalProfileImageURL(), rootFact));
+		if (!u.getDescription().equals("")) fb.addFact(new Fact<>("Description", u.getDescription(), rootFact));
 
 		URLEntity[] urls = u.getDescriptionURLEntities();
 		if (urls.length > 0) {
 			for (int i = 0; i < urls.length; i++) {
-				fb.addFact(new Fact<String>("Linked URL", urls[i].getExpandedURL(), "Twitter", "UserProfile"));
+				fb.addFact(new Fact<>("Linked URL", urls[i].getExpandedURL(), rootFact));
 			}
 		}
 
-		fb.addFact(new Fact<>("Max Birth Date", u.getCreatedAt(), "Twitter", "UserProfile"));
-		fb.addFact(new Fact<>("Language", u.getLang(), "Twitter", "UserProfile"));
-		fb.addFact(new Fact<>("Location", u.getLocation(), "Twitter", "UserProfile"));
-		fb.addFact(new Fact<>("Time Zone", u.getTimeZone(), "Twitter", "UserProfile"));
-		fb.addFact(new Fact<>("Linked URL", u.getURLEntity().getExpandedURL(), "Twitter", "UserProfile"));
+		fb.addFact(new Fact<>("Max Birth Date", u.getCreatedAt(), rootFact));
+		fb.addFact(new Fact<>("Language", u.getLang(), rootFact));
+		fb.addFact(new Fact<>("Location", u.getLocation(), rootFact));
+		fb.addFact(new Fact<>("Time Zone", u.getTimeZone(), rootFact));
+		fb.addFact(new Fact<>("Linked URL", u.getURLEntity().getExpandedURL(), rootFact));
 
 		System.out.println("   Processing the user's tweets");
 
@@ -63,7 +65,7 @@ public class TwitterMiner {
 		ArrayList<Status> tweets = getTweets(twitter, id);
 
 		for (int i = 0; i < tweets.size(); i++) {
-			fb.addFact(new Fact<MinedPost>("Posted", mineTweet(tweets.get(i)), "Twitter", "Tweets"));
+			fb.addFact(new Fact<MinedPost>("Posted", mineTweet(tweets.get(i)), rootFact));
 		}
 
 		System.out.println("   Processing the user's friends");
@@ -79,7 +81,7 @@ public class TwitterMiner {
 			mutualFriendUsers = getUsersFromIDs(twitter, mutuals);
 
 			for (int i = 0; i < mutualFriendUsers.size(); i++) {
-				fb.addFact(new Fact<>("Friend", mineUser(mutualFriendUsers.get(i)), "Twitter", "Followers/Following"));
+				fb.addFact(new Fact<>("Friend", mineUser(mutualFriendUsers.get(i)), rootFact));
 			}
 		}
 
@@ -116,7 +118,7 @@ public class TwitterMiner {
 	// Gets as many tweets by a user as possible.
 	private static ArrayList<Status> getTweets(Twitter t, long id) {
 		int pageno = 1;
-	    ArrayList statuses = new ArrayList();
+	    ArrayList<Status> statuses = new ArrayList<>();
 
 	    // Page through all of the available tweets and add them to the list.
 	    while (true) {
@@ -135,14 +137,14 @@ public class TwitterMiner {
 	}
 
 	// Gets a list of mutual friends of a given user.
-	private static ArrayList getMutualFriends(Twitter t, long id, int followerNo, int friendNo) {
+	private static ArrayList<Long> getMutualFriends(Twitter t, long id, int followerNo, int friendNo) {
 
 		// If the counts exceed either maximum then: do not process the friends. 
 		if (followerNo <= MAX_FOLLOWER_COUNT && friendNo <= MAX_FRIEND_COUNT) {
 			
 			// Get the lists of followers and friends and then take the common IDs.
-			ArrayList mutuals = getFollowers(t, id);
-			ArrayList friends = getFriends(t, id);
+			ArrayList<Long> mutuals = getFollowers(t, id);
+			ArrayList<Long> friends = getFriends(t, id);
 			mutuals.retainAll(friends);
 
 			return mutuals;
@@ -181,8 +183,8 @@ public class TwitterMiner {
 	}
 
 	// Gets a list of a user's friend's (people they follow) ID numbers.
-	private static ArrayList getFriends(Twitter t, long id) {
-		ArrayList idList = new ArrayList();
+	private static ArrayList<Long> getFriends(Twitter t, long id) {
+		ArrayList<Long> idList = new ArrayList<>();
 
 		IDs ids;
 		long[] idNumbers;
@@ -248,7 +250,7 @@ public class TwitterMiner {
 					System.out.println("   Waiting " + rls.getSecondsUntilReset() + "s for rate limit");
 					TimeUnit.SECONDS.sleep(rls.getSecondsUntilReset() + 1);
 					//System.out.println("Waiting finished. " + t.getRateLimitStatus().get(endpoint).getSecondsUntilReset() + "s until next reset");
-				} else return;
+				}
 			} else {
 				System.err.println(endpoint + " endpoint is incorrect");
 				System.err.println(rateLimitsMap.keySet().toString());

@@ -15,6 +15,8 @@ public class FacebookMiner {
         System.out.println("\n - STARTING FACEBOOK MINER - \n");
 
 	    FactBook fs = new FactBook();
+	    Fact rootFact = new Fact<>("Facebook User ID", id, null);
+        fs.addFact(rootFact);
 
         System.out.println("   Connecting to API and retrieving user data");
 
@@ -45,9 +47,11 @@ public class FacebookMiner {
                 Reading r = new Reading().fields("images");
                 ResponseList<Photo> photos = fb.getPhotos(r);
                 List<Image> images;
+                String url;
                 for (Photo photo : photos) {
                      images = photo.getImages();
-                    fs.addFact(new Fact<>("Image URL", images.get(0).getSource().toString(), "Facebook", "Photos"));
+                     url = images.get(0).getSource().toString();
+                     fs.addFact(new Fact<>("Image URL", url, rootFact));
                 }
 
                 // TODO fb.getVideos (logged in or not)
@@ -66,18 +70,18 @@ public class FacebookMiner {
 
 		if (u.getLanguages() != null) {
 			for (int i = 0; i < u.getLanguages().size(); i++) {
-				fs.addFact(new Fact<>("Language", u.getLanguages().get(i).getName(), "Facebook", "UserProfile"));
+				fs.addFact(new Fact<>("Language", u.getLanguages().get(i).getName(), rootFact));
 			}
 		}
 
 		// Add the available data to the factbook.
-		if (u.getName() != null) 		        fs.addFact(new Fact<>("Name", u.getName(), "Facebook", "UserProfile"));
-		if (u.getFirstName() != null) 		    fs.addFact(new Fact<>("First Name", u.getFirstName(), "Facebook", "UserProfile"));
-		if (u.getMiddleName() != null) 			fs.addFact(new Fact<>("Middle Name", u.getMiddleName(), "Facebook", "UserProfile"));
-		if (u.getLastName() != null) 			fs.addFact(new Fact<>("Last Name", u.getLastName(), "Facebook", "UserProfile"));
-		if (u.getUsername() != null) 			fs.addFact(new Fact<>("Username", u.getUsername(), "Facebook", "UserProfile"));
+		if (u.getName() != null) 		        fs.addFact(new Fact<>("Name", u.getName(), rootFact));
+		if (u.getFirstName() != null) 		    fs.addFact(new Fact<>("First Name", u.getFirstName(), rootFact));
+		if (u.getMiddleName() != null) 			fs.addFact(new Fact<>("Middle Name", u.getMiddleName(), rootFact));
+		if (u.getLastName() != null) 			fs.addFact(new Fact<>("Last Name", u.getLastName(), rootFact));
+		if (u.getUsername() != null) 			fs.addFact(new Fact<>("Username", u.getUsername(), rootFact));
 		if (u.getPicture() != null && !u.getPicture().isSilhouette())
-		                                        fs.addFact(new Fact<>("Image URL", u.getPicture().getURL().toString(), "Facebook", "UserProfile"));
+		                                        fs.addFact(new Fact<>("Image URL", u.getPicture().getURL().toString(), rootFact));
 		if (u.getAgeRange() != null) {
 		    // Get current date.
             Calendar max = Calendar.getInstance();
@@ -88,52 +92,52 @@ public class FacebookMiner {
             min.add(Calendar.YEAR, - u.getAgeRange().getMax());
 
             // Parse the dates into facts.
-            fs.addFact(new Fact<>("Max Birth Date", max.getTime(), "Facebook", "UserProfile"));
-		    fs.addFact(new Fact<>("Min Birth Date", min.getTime(), "Facebook", "UserProfile"));
+            fs.addFact(new Fact<>("Max Birth Date", max.getTime(), rootFact));
+		    fs.addFact(new Fact<>("Min Birth Date", min.getTime(), rootFact));
 		}
 
-		if (u.getBio() != null) 				fs.addFact(new Fact<>("Description", u.getBio(), "Facebook", "UserProfile"));
+		if (u.getBio() != null) 				fs.addFact(new Fact<>("Description", u.getBio(), rootFact));
 
 		if (u.getBirthday() != null) {
             String bday = u.getBirthday();
             if (bday.length() == 4) { // YYYY
-                fs.addFact(new Fact<>("Birth Year", Util.parseDate(bday, "yyyy"), "Facebook", "UserProfile"));
+                fs.addFact(new Fact<>("Birth Year", Util.parseDate(bday, "yyyy"), rootFact));
             } else { // MM/DD
                 String[] parts = bday.split("/");
-                fs.addFact(new Fact<>("Birth Month", parts[0], "Facebook", "UserProfile"));
-                fs.addFact(new Fact<>("Birth Day", parts[1], "Facebook", "UserProfile"));
+                fs.addFact(new Fact<>("Birth Month", parts[0], rootFact));
+                fs.addFact(new Fact<>("Birth Day", parts[1], rootFact));
                 if (parts.length > 2)
-                    fs.addFact(new Fact<>("Birth Year", Util.parseDate(parts[2], "yyyy"), "Facebook", "UserProfile"));
+                    fs.addFact(new Fact<>("Birth Year", Util.parseDate(parts[2], "yyyy"), rootFact));
             }
 		}
 
-        if (u.getEmail() != null) 				fs.addFact(new Fact<>("Email", u.getEmail(), "Facebook", "UserProfile"));
-		if (u.getGender() != null) 				fs.addFact(new Fact<>("Gender", u.getGender(), "Facebook", "UserProfile"));
-		if (u.getTimezone() != null) 			fs.addFact(new Fact<>("Time Zone", u.getTimezone(), "Facebook", "UserProfile"));
+        if (u.getEmail() != null) 				fs.addFact(new Fact<>("Email", u.getEmail(), rootFact));
+		if (u.getGender() != null) 				fs.addFact(new Fact<>("Gender", u.getGender(), rootFact));
+		if (u.getTimezone() != null) 			fs.addFact(new Fact<>("Time Zone", u.getTimezone(), rootFact));
 		if (u.getHometown() != null && u.getHometown().getName()!=null)
-		                                        fs.addFact(new Fact<>("Home Town", u.getHometown().getName(), "Facebook", "UserProfile"));
+		                                        fs.addFact(new Fact<>("Home Town", u.getHometown().getName(), rootFact));
 		if (u.getLocation() != null && u.getLocation().getName()!=null)
-		                                        fs.addFact(new Fact<>("Location", u.getLocation().getName(), "Facebook", "UserProfile"));
-		if (u.getLocale() != null)				fs.addFact(new Fact<>("Locale", u.getLocale(), "Facebook", "UserProfile"));
-		if (u.getLink() != null)				fs.addFact(new Fact<>("Linked URL", u.getLink().toString(), "Facebook", "UserProfile"));
-		if (u.getRelationshipStatus() != null)	fs.addFact(new Fact<>("Relationship Status", u.getRelationshipStatus(), "Facebook", "UserProfile"));
-		if (u.getPolitical() != null)			fs.addFact(new Fact<>("Politics", u.getPolitical(), "Facebook", "UserProfile"));
-		if (u.getReligion() != null)			fs.addFact(new Fact<>("Religion", u.getReligion(), "Facebook", "UserProfile"));
-		if (u.getWebsite() != null)				fs.addFact(new Fact<>("Linked URL", u.getWebsite().toString(), "Facebook", "UserProfile"));
-		if (u.getInterestedIn() != null)		fs.addFact(new Fact<>("Interest In", u.getInterestedIn(), "Facebook", "UserProfile"));
-        if (u.getSignificantOther() != null)    fs.addFact(new Fact<>("Partner", u.getSignificantOther().getName(), "Facebook", "UserProfile"));
-        if (u.getCover() != null)               fs.addFact(new Fact<>("Image URL", u.getCover().getSource(), "Facebook", "UserProfile"));
+		                                        fs.addFact(new Fact<>("Location", u.getLocation().getName(), rootFact));
+		if (u.getLocale() != null)				fs.addFact(new Fact<>("Locale", u.getLocale(), rootFact));
+		if (u.getLink() != null)				fs.addFact(new Fact<>("Linked URL", u.getLink().toString(), rootFact));
+		if (u.getRelationshipStatus() != null)	fs.addFact(new Fact<>("Relationship Status", u.getRelationshipStatus(), rootFact));
+		if (u.getPolitical() != null)			fs.addFact(new Fact<>("Politics", u.getPolitical(), rootFact));
+		if (u.getReligion() != null)			fs.addFact(new Fact<>("Religion", u.getReligion(), rootFact));
+		if (u.getWebsite() != null)				fs.addFact(new Fact<>("Linked URL", u.getWebsite().toString(), rootFact));
+		if (u.getInterestedIn() != null)		fs.addFact(new Fact<>("Interest In", u.getInterestedIn(), rootFact));
+        if (u.getSignificantOther() != null)    fs.addFact(new Fact<>("Partner", u.getSignificantOther().getName(), rootFact));
+        if (u.getCover() != null)               fs.addFact(new Fact<>("Image URL", u.getCover().getSource(), rootFact));
 
         if (u.getEducation() != null) {
             List<User.Education> educations = u.getEducation();
             for (User.Education edu : educations)
-                fs.addFact(new Fact<>("Education", edu, "Facebook", "UserProfile"));
+                fs.addFact(new Fact<>("Education", edu, rootFact));
         }
 
         if (u.getWork() != null) {
             List<User.Work> work = u.getWork();
             for (User.Work w : work)
-                fs.addFact(new Fact<>("Work", w, "Facebook", "UserProfile"));
+                fs.addFact(new Fact<>("Work", w, rootFact));
         }
 
         System.out.println("\n - FACEBOOK MINER FINISHED - \n");

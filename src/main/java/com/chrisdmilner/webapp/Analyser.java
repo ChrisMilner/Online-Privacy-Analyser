@@ -22,12 +22,15 @@ public class Analyser {
     //  - Lanuages
     //  - Friends
 
+    private final static int CURRENT_YEAR = 2018;
+
     public static ArrayList<Conclusion> analyse(FactBook f) {
         System.out.println("\n - STARTING ANALYSER - \n");
 
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
         analyseName(f);
+
         conclusions.addAll(analyseNameParts(f));
         conclusions.addAll(analyseBirthDate(f));
         conclusions.addAll(analyseImages(f));
@@ -59,7 +62,7 @@ public class Analyser {
                     // Divide by capitals
                     tokens = value.split("(?=\\p{Upper})");
                     if (tokens.length > 1) addNameTokens(fb, tokens, name);
-                    else fb.addFact(new Fact<>("First Name", removeNonLetters(value), name.getSource(), name.getSubSource()));
+                    else fb.addFact(new Fact<>("First Name", removeNonLetters(value), name));
                 }
             }
 
@@ -71,12 +74,12 @@ public class Analyser {
                 int intnum = Integer.parseInt(num);
                 try {
                     if (num.length() == 2) {
-                        if (intnum > 20)
-                            fb.addFact(new Fact<>("Birth Year", df.parse("19" + num), name.getSource(), name.getSubSource()));
+                        if (intnum > (CURRENT_YEAR - 2000))
+                            fb.addFact(new Fact<>("Birth Year", df.parse("19" + num), name));
                         else
-                            fb.addFact(new Fact<>("Birth Year", df.parse("20" + num), name.getSource(), name.getSubSource()));
-                    } else if (num.length() == 4 && intnum > 1900 && intnum <= 2017)
-                        fb.addFact(new Fact<>("Birth Year", df.parse(num), name.getSource(), name.getSubSource()));
+                            fb.addFact(new Fact<>("Birth Year", df.parse("20" + num), name));
+                    } else if (num.length() == 4 && intnum > 1900 && intnum <= CURRENT_YEAR)
+                        fb.addFact(new Fact<>("Birth Year", df.parse(num), name));
                 } catch (ParseException e) {
                     System.err.println("ERROR converting date to correct format: yyyy");
                     e.printStackTrace();
@@ -88,15 +91,14 @@ public class Analyser {
     private static void addNameTokens(FactBook fb, String[] tokens, Fact source) {
         for (int i = 0; i < tokens.length; i++) {
             tokens[i] = removeNonLetters(tokens[i]);
-//            System.out.println(tokens[i]);
         }
 
-        fb.addFact(new Fact<>("First Name", tokens[0], source.getSource(), source.getSubSource()));
-        fb.addFact(new Fact<>("Last Name", tokens[tokens.length - 1], source.getSource(), source.getSubSource()));
+        fb.addFact(new Fact<>("First Name", tokens[0], source));
+        fb.addFact(new Fact<>("Last Name", tokens[tokens.length - 1], source));
 
         if (tokens.length > 2) {
             for (int i = 1; i < tokens.length - 1; i++)
-                fb.addFact(new Fact<>("Middle Name", tokens[i], source.getSource(), source.getSubSource()));
+                fb.addFact(new Fact<>("Middle Name", tokens[i], source));
         }
     }
 
@@ -104,79 +106,83 @@ public class Analyser {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
         String[] nameParts = {"First Name", "Middle Name", "Last Name"};
-        double confidence;
-        HashSet<String> sources = new HashSet<>();
 
+        Conclusion c;
         for (String namePart : nameParts) {
-            ArrayList<Fact> part = f.getFactsWithName(namePart);
-
-            if (part.isEmpty()) continue;
-
-            ArrayList<Double> initConfidences = new ArrayList<Double>();
-            for (int i = 0; i < part.size(); i++)
-                initConfidences.add(getConfidenceFromSource(part.get(i).getSource(), part.get(i).getSubSource()));
-
-            // Sorts the facts by their confidence.
-            Collections.sort(part, Comparator.comparing(item -> initConfidences.get(part.indexOf(item))));
-            Collections.reverse(part);
-            initConfidences.sort(Comparator.reverseOrder());
-
-            confidence = initConfidences.get(0);
-            sources.add(part.get(0).getSourceString());
-
-            if (part.size() > 1) {
-                String val1, val2;
-                while (part.size() != 1) {
-                    val1 = ((String) part.get(0).getValue()).toLowerCase();
-                    val2 = ((String) part.get(1).getValue()).toLowerCase();
-
-//                    System.out.println("   Comparing " + val1 + " and " + val2);
-
-                    if (val1.equals(val2) || val1.contains(val2) || val2.contains(val1)) {
-                        sources.add(part.get(1).getSourceString());
-                        part.remove(1);
-                        if (confidence >= initConfidences.get(1))
-                            confidence += ((1 - confidence) * initConfidences.get(1));
-                        else
-                            confidence = initConfidences.get(1) + ((1- initConfidences.get(1)) * confidence);
-                    } else {
-                        if (confidence >= initConfidences.get(1)) {
-                            part.remove(1);
-                            confidence *= (1 - initConfidences.get(1));
-                        } else {
-                            part.remove(0);
-                            confidence = initConfidences.get(1) * (1 - confidence);
-                            sources.clear();
-                            sources.add(part.get(0).getSourceString());
-                        }
-                    }
-
-//                    System.out.println("   Took " + part.get(0).getValue() + " Confidence: " + confidence);
-
-                    if (part.size() > 1) initConfidences.remove(1);
-                }
-            }
-
-            ArrayList<String> names;
-            if (namePart.equals("Last Name"))
-                names = Util.readResourceFileLines("data/lastnames.csv");
-            else
-                names = Util.readResourceFileLines("data/firstnames.csv");
-
-            String candidateName = (String) part.get(0).getValue();
-            for (String name : names) {
-                if (candidateName.equals(name)) {
-                    confidence += ((1 - confidence) * 0.8);
-                    break;
-                }
-            }
-
-            System.out.println("   " + namePart + ": " + part.get(0).getValue() + "  Confidence: " + confidence);
-            String[] sourceArr = sources.toArray(new String[sources.size()]);
-            conclusions.add(new Conclusion(namePart, candidateName, confidence, sourceArr));
+            c = analyseNamePart(f, namePart);
+            if (c != null) conclusions.add(c);
         }
 
         return conclusions;
+    }
+
+    private static Conclusion analyseNamePart(FactBook f, String namePart) {
+        double confidence;
+        ArrayList<Fact> sources = new ArrayList<>();
+
+        ArrayList<Fact> part = f.getFactsWithName(namePart);
+
+        if (part.isEmpty()) return null;
+
+        ArrayList<Double> initConfidences = new ArrayList<Double>();
+        for (int i = 0; i < part.size(); i++)
+            initConfidences.add(getConfidenceFromSource(part.get(i).getSource()));
+
+        // Sorts the facts by their confidence.
+        Collections.sort(part, Comparator.comparing(item -> initConfidences.get(part.indexOf(item))));
+        Collections.reverse(part);
+        initConfidences.sort(Comparator.reverseOrder());
+
+        confidence = initConfidences.get(0);
+        sources.add(part.get(0));
+
+        if (part.size() > 1) {
+            String val1, val2;
+            while (part.size() != 1) {
+                val1 = ((String) part.get(0).getValue()).toLowerCase();
+                val2 = ((String) part.get(1).getValue()).toLowerCase();
+
+//                    System.out.println("   Comparing " + val1 + " and " + val2);
+
+                if (val1.equals(val2) || val1.contains(val2) || val2.contains(val1)) {
+                    sources.add(part.get(1));
+                    part.remove(1);
+                    if (confidence >= initConfidences.get(1))
+                        confidence += ((1 - confidence) * initConfidences.get(1));
+                    else
+                        confidence = initConfidences.get(1) + ((1- initConfidences.get(1)) * confidence);
+                } else {
+                    if (confidence >= initConfidences.get(1)) {
+                        part.remove(1);
+                        confidence *= (1 - initConfidences.get(1));
+                    } else {
+                        part.remove(0);
+                        confidence = initConfidences.get(1) * (1 - confidence);
+                        sources.clear();
+                        sources.add(part.get(0));
+                    }
+                }
+
+                if (part.size() > 1) initConfidences.remove(1);
+            }
+        }
+
+        ArrayList<String> names;
+        if (namePart.equals("Last Name"))
+            names = Util.readResourceFileLines("data/lastnames.csv");
+        else
+            names = Util.readResourceFileLines("data/firstnames.csv");
+
+        String candidateName = (String) part.get(0).getValue();
+        for (String name : names) {
+            if (candidateName.equals(name)) {
+                confidence += ((1 - confidence) * 0.8);
+                break;
+            }
+        }
+
+        System.out.println("   " + namePart + ": " + part.get(0).getValue() + "  Confidence: " + confidence);
+        return new Conclusion(namePart, candidateName, confidence, sources);
     }
 
     private static String removeNonLetters(String s) {
@@ -185,7 +191,7 @@ public class Analyser {
 
     private static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
-        HashSet<String> sources = new HashSet<>();
+        ArrayList<Fact> sources = new ArrayList<>();
 
         // Get the max and min birth dates.
         Fact maxFact = getMaxBirthDate(f);
@@ -210,11 +216,11 @@ public class Analyser {
 
             ArrayList<Double> initConfidences = new ArrayList<>();
             for (int i = 0; i < birthYears.size(); i++)
-                initConfidences.add(getConfidenceFromSource(birthYears.get(i).getSource(), birthYears.get(i).getSubSource()));
+                initConfidences.add(getConfidenceFromSource(birthYears.get(i).getSource()));
 
             double confidence = initConfidences.get(0);
 
-            sources.add(birthYears.get(0).getSourceString());
+            sources.add(birthYears.get(0));
 
             while (birthYears.size() > 1) {
                 Calendar y1 = Calendar.getInstance();
@@ -227,7 +233,7 @@ public class Analyser {
 
                 if (y1.get(Calendar.YEAR) == y2.get(Calendar.YEAR)) {
                     confidence += ((1 - confidence) * initConfidences.get(1));
-                    sources.add(birthYears.get(1).getSourceString());
+                    sources.add(birthYears.get(1));
                     birthYears.remove(1);
                 } else {
                     if (confidence >= initConfidences.get(1)) {
@@ -238,14 +244,14 @@ public class Analyser {
                         birthYears.remove(0);
                         confidence = initConfidences.get(1) * (1 - confidence);
                     }
-                    sources.add(birthYears.get(0).getSourceString());
+                    sources.add(birthYears.get(0));
                 }
 
                 initConfidences.remove(1);
             }
 
-            if (maxFact != null) sources.add(maxFact.getSourceString());
-            if (minFact != null) sources.add(minFact.getSourceString());
+            if (maxFact != null) sources.add(maxFact);
+            if (minFact != null) sources.add(minFact);
 
             // Convert Date to String.
             Calendar c = Calendar.getInstance();
@@ -253,25 +259,21 @@ public class Analyser {
             int yearInt = c.get(Calendar.YEAR);
             String year = Integer.toString(yearInt);
 
-            // Get sources as string array.
-            String[] sourceArr = sources.toArray(new String[sources.size()]);
-
-            conclusions.add(new Conclusion("Birth Year", year, confidence, sourceArr));
+            conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
             System.out.println("   Birth Year: " + year + "  Confidence: " + confidence);
 
             c = Calendar.getInstance();
             int maxAge = (c.get(Calendar.YEAR) - yearInt);
             String age = (maxAge - 1) + " - " + maxAge;
 
-            conclusions.add(new Conclusion("Age", age, confidence, sourceArr));
+            conclusions.add(new Conclusion("Age", age, confidence, sources));
             System.out.println("   Age: " + age + "  Confidence: " + confidence);
         } else if (maxFact != null && minFact != null) {
-            double confidence = getConfidenceFromSource(maxFact.getSource(), maxFact.getSubSource());
-            confidence *= getConfidenceFromSource(minFact.getSource(), minFact.getSubSource());
+            double confidence = getConfidenceFromSource(maxFact.getSource());
+            confidence *= getConfidenceFromSource(minFact.getSource());
 
-            sources.add(maxFact.getSourceString());
-            sources.add(minFact.getSourceString());
-            String[] sourceArr = sources.toArray(new String[sources.size()]);
+            sources.add(maxFact);
+            sources.add(minFact);
 
             Calendar c1 = Calendar.getInstance();
             Calendar c2 = Calendar.getInstance();
@@ -282,14 +284,14 @@ public class Analyser {
 
             String year = (y1 - 1) + " - " + y2;
 
-            conclusions.add(new Conclusion("Birth Year", year, confidence, sourceArr));
+            conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
             System.out.println("   Birth Year: " + year + "  Confidence: " + confidence);
 
             Calendar c = Calendar.getInstance();
             int currYear = c.get(Calendar.YEAR);
             String age = (currYear - y2) + " - " + (currYear - y1);
 
-            conclusions.add(new Conclusion("Age", age, confidence, sourceArr));
+            conclusions.add(new Conclusion("Age", age, confidence, sources));
             System.out.println("   Age: " + age + "  Confidence: " + confidence);
         } else if (maxFact != null) {
             Calendar c1 = Calendar.getInstance();
@@ -302,9 +304,10 @@ public class Analyser {
             int year = currYear - maxYear;
             String age = year + " or Over";
 
-            double confidence = getConfidenceFromSource(maxFact.getSource(), maxFact.getSubSource());
+            double confidence = getConfidenceFromSource(maxFact.getSource());
 
-            conclusions.add(new Conclusion("Age", age, confidence, new String[] {maxFact.getSourceString()}));
+            sources.add(maxFact);
+            conclusions.add(new Conclusion("Age", age, confidence, sources));
             System.out.println("   Age: " + age + "  Confidence: " + confidence);
         } else if (minFact != null) {
             Calendar c1 = Calendar.getInstance();
@@ -317,9 +320,10 @@ public class Analyser {
             int year = currYear - maxYear;
             String age = year + " or Under";
 
-            double confidence = getConfidenceFromSource(minFact.getSource(), minFact.getSubSource());
+            double confidence = getConfidenceFromSource(minFact.getSource());
 
-            conclusions.add(new Conclusion("Age", age, confidence, new String[] {minFact.getSourceString()}));
+            sources.add(minFact);
+            conclusions.add(new Conclusion("Age", age, confidence, sources));
             System.out.println("   Age: " + age + "  Confidence: " + confidence);
         }
 
@@ -370,29 +374,31 @@ public class Analyser {
         ArrayList<Fact> imageURLs = f.getFactsWithName("Image URL");
 
         for (Fact url : imageURLs) {
-            double confidence =  getConfidenceFromSource(url.getSource(), url.getSubSource());
-            String[] sources = new String[] { url.getSourceString() };
+            double confidence =  getConfidenceFromSource(url.getSource());
+            ArrayList<Fact> sources = new ArrayList<>();
+            sources.add(url);
             conclusions.add(new Conclusion("Image URL", (String) url.getValue(), confidence, sources));
         }
 
         return  conclusions;
     }
 
-    private static double getConfidenceFromSource(String source, String subsource) {
-        double confidence = 0;
+    private static double getConfidenceFromSource(Fact source) {
+        double confidence = 1;
 
-        switch (source) {
-            case "Twitter": confidence = 0.6; break;
-            case "Facebook": confidence = 0.95; break;
-            case "Reddit": confidence = 0.2; break;
-        }
+        // TODO: Add all possible fact names to switch statement.
 
-        switch (subsource) {
-            case "UserProfile": confidence *= 1.0; break;
-            case "Tweets": confidence *= 0.7; break;
-            case "Followers/Following": confidence *= 0.7; break;
-            case "CommentHistory": confidence *= 0.5; break;
-            case "PostHistory": confidence *= 0.7; break;
+        Fact s = source;
+        while (s != null) {
+            switch (s.getName()) {
+                case "Facebook User ID":    confidence *= 0.95; break;
+                case "Twitter Handle":      confidence *= 0.7; break;
+                case "Reddit User Name":    confidence *= 0.4; break;
+
+                default: confidence *= 1;
+            }
+
+            s = s.getSource();
         }
 
         return confidence;
