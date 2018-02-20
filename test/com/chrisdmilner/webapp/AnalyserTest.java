@@ -14,6 +14,7 @@ public class AnalyserTest {
 
     @org.junit.Test
     public void analyse() throws Exception {
+        // Create the test data.
         Fact fbRoot = new Fact<>("Facebook User ID", "100008177116719", null);
         Fact twRoot = new Fact<>("Twitter Handle", "ChrisDMilner", null);
         Fact rdRoot = new Fact<>("Reddit User Name", "Radioactive1997", null);
@@ -29,7 +30,7 @@ public class AnalyserTest {
         fb.addFact(new Fact<>("Image URL", "http://example.com/image.png", fbRoot));
 
         try {
-            DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
             fb.addFact(new Fact<>("Max Birth Date", df.parse("17/08/2005"), fbRoot));
             fb.addFact(new Fact<>("Min Birth Date", df.parse("17/08/1995"), fbRoot));
             fb.addFact(new Fact<>("Birth Year", df.parse("01/01/1997"), fbRoot));
@@ -38,6 +39,7 @@ public class AnalyserTest {
             e.printStackTrace();
         }
 
+        // Test that the analyser runs correctly and returns some conclusions.
         ArrayList<Conclusion> conclusions = Analyser.analyse(fb);
         assertTrue(conclusions.size() > 0);
 
