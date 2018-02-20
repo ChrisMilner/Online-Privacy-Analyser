@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -100,6 +101,17 @@ public class Util {
         }
 
         return d;
+    }
+
+    public static int getYearFromDate(Date d) {
+        Calendar y = Calendar.getInstance();
+        y.setTime(d);
+        return y.get(Calendar.YEAR);
+    }
+
+    public static int getCurrentYear() {
+        Calendar c = Calendar.getInstance();
+        return c.get(Calendar.YEAR);
     }
 
 }
