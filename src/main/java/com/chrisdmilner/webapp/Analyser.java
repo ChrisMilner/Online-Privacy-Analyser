@@ -1,5 +1,6 @@
 package com.chrisdmilner.webapp;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -196,8 +197,9 @@ public class Analyser {
             }
         }
 
-        Fact bestName = getGreatestWeightedConfidence(names);
-        double greatestConf = getConfidenceFromSource(bestName.getSource());
+        FactPlus bestNameFP = getGreatestWeightedConfidence(names);
+        Fact bestName = bestNameFP.getFact();
+        double greatestConf = bestNameFP.getConfidence();
         int greatestIndex = names.indexOf(bestName);
 
         return new Conclusion(namePart, (String) bestName.getValue(), greatestConf, sources.get(greatestIndex));
@@ -247,78 +249,50 @@ public class Analyser {
         ArrayList<Fact> birthYears = f.getFactsWithName("Birth Year");
         birthYears = removeDatesOutsideRange(birthYears, minDate, maxDate);
 
+        if (maxFact != null) sources.add(maxFact);
+        if (minFact != null) sources.add(minFact);
+
         // Combine the remaining birth years to get a final answer.
         if (!birthYears.isEmpty()) {
-            // TODO: Properly handle confidences.
-
-            Fact bestYear = getGreatestWeightedConfidence(birthYears);
-            double greatestConf = getConfidenceFromSource(bestYear.getSource());
-
-            if (maxFact != null) sources.add(maxFact);
-            if (minFact != null) sources.add(minFact);
-            sources.add(bestYear);
+            FactPlus bestYearFP = getGreatestWeightedConfidence(birthYears);
+            Fact bestYear = bestYearFP.getFact();
+            double confidence = bestYearFP.getConfidence();
+            sources.addAll(bestYearFP.getSources());
 
             int yearInt = Util.getYearFromDate((Date) bestYear.getValue());
             String year = Integer.toString(yearInt);
-
-            conclusions.add(new Conclusion("Birth Year", year, greatestConf, sources));
+            conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
 
             int maxAge = Util.getCurrentYear() - yearInt;
             String age = (maxAge - 1) + " - " + maxAge;
-
-            conclusions.add(new Conclusion("Age", age, greatestConf, sources));
+            conclusions.add(new Conclusion("Age", age, confidence, sources));
         } else if (maxFact != null && minFact != null) {
             double confidence = getConfidenceFromSource(maxFact.getSource());
             confidence *= getConfidenceFromSource(minFact.getSource());
 
-            sources.add(maxFact);
-            sources.add(minFact);
-
-            Calendar c1 = Calendar.getInstance();
-            Calendar c2 = Calendar.getInstance();
-            c1.setTime(minDate);
-            c2.setTime(maxDate);
-            int y1 = c1.get(Calendar.YEAR);
-            int y2 = c2.get(Calendar.YEAR);
-
+            int y1 = Util.getYearFromDate(minDate);
+            int y2 = Util.getYearFromDate(maxDate);
             String year = (y1 - 1) + " - " + y2;
-
             conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
 
-            Calendar c = Calendar.getInstance();
-            int currYear = c.get(Calendar.YEAR);
+            int currYear = Util.getCurrentYear();
             String age = (currYear - y2) + " - " + (currYear - y1);
-
             conclusions.add(new Conclusion("Age", age, confidence, sources));
         } else if (maxFact != null) {
-            Calendar c1 = Calendar.getInstance();
-            int currYear = c1.get(Calendar.YEAR);
+            int currYear = Util.getCurrentYear();
+            int maxYear = Util.getYearFromDate(maxDate);
 
-            Calendar c2 = Calendar.getInstance();
-            c2.setTime(maxDate);
-            int maxYear = c2.get(Calendar.YEAR);
-
-            int year = currYear - maxYear;
-            String age = year + " or Over";
-
+            int minAge = currYear - maxYear;
+            String age = minAge + " or Over";
             double confidence = getConfidenceFromSource(maxFact.getSource());
-
-            sources.add(maxFact);
             conclusions.add(new Conclusion("Age", age, confidence, sources));
         } else if (minFact != null) {
-            Calendar c1 = Calendar.getInstance();
-            int currYear = c1.get(Calendar.YEAR);
+            int currYear = Util.getCurrentYear();
+            int maxYear = Util.getYearFromDate(minDate);
 
-            Calendar c2 = Calendar.getInstance();
-            c2.setTime(minDate);
-            int maxYear = c2.get(Calendar.YEAR);
-
-            int year = currYear - maxYear;
-            String age = year + " or Under";
-
+            int maxAge = currYear - maxYear;
+            String age = maxAge + " or Under";
             double confidence = getConfidenceFromSource(minFact.getSource());
-
-            sources.add(minFact);
             conclusions.add(new Conclusion("Age", age, confidence, sources));
         }
 
@@ -364,8 +338,6 @@ public class Analyser {
     }
 
     private static ArrayList<Fact> removeDatesOutsideRange(ArrayList<Fact> dates, Date min, Date max) {
-        HashSet<Date> dateSet = new HashSet<>();
-
         Date d;
         for (int i = dates.size() - 1; i >= 0; i--) {
             d = (Date) dates.get(i).getValue();
@@ -374,35 +346,51 @@ public class Analyser {
                 dates.remove(i);
             else if (min != null && d.before(min))
                 dates.remove(i);
-            else if (dateSet.contains(d))
-                dates.remove(i);
-            else
-                dateSet.add(d);
         }
         return dates;
     }
 
-    private static Fact getGreatestWeightedConfidence(ArrayList<Fact> facts) {
-        double[] confidences = new double[facts.size()];
+    private static FactPlus getGreatestWeightedConfidence(ArrayList<Fact> facts) {
+        ArrayList<Double> confidences = new ArrayList<>();
+        ArrayList<ArrayList> sources = new ArrayList<>();
+
+        // Get all of the confidences into the list and get the total.
         double conf;
         double total = 0;
-        for (int i = 0; i < confidences.length; i++) {
+        for (int i = 0; i < facts.size(); i++) {
+            sources.add(new ArrayList<Fact>());
+            sources.get(i).add(facts.get(i));
             conf = getConfidenceFromSource(facts.get(i).getSource());
-            confidences[i] = conf;
+            confidences.add(conf);
             total += conf;
+        }
+
+        // Combine the confidences and sources of any duplicates.
+        for (int i = 1; i < facts.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                System.out.println("Comparing " + j + ":" + facts.get(j).getValue() + " with " + i + ":" + facts.get(i).getValue());
+                if (facts.get(i).getValue().equals(facts.get(j).getValue())) {
+                    System.out.println("Removing " + i);
+                    confidences.set(j, confidences.get(i) + confidences.get(j));
+                    sources.get(j).addAll(sources.get(i));
+                    sources.remove(i);
+                    confidences.remove(i);
+                    facts.remove(i--);
+                }
+            }
         }
 
         double greatestConf = 0;
         int greatestIndex = -1;
-        for (int i = 0; i < confidences.length; i++) {
-            confidences[i] /= total;
-            if (confidences[i] > greatestConf) {
-                greatestConf = confidences[i];
+        for (int i = 0; i < confidences.size(); i++) {
+            confidences.set(i, confidences.get(i) / total);
+            if (confidences.get(i) > greatestConf) {
+                greatestConf = confidences.get(i);
                 greatestIndex = i;
             }
         }
 
-        return facts.get(greatestIndex);
+        return new FactPlus(facts.get(greatestIndex), greatestConf, sources.get(greatestIndex));
     }
 
     private static ArrayList<Conclusion> analyseImages(FactBook f) {
@@ -441,4 +429,47 @@ public class Analyser {
         return confidence;
     }
 
+}
+
+class FactPlus {
+
+    private Fact fact;
+    private double confidence;
+    private ArrayList<Fact> sources;
+
+    public FactPlus(Fact fact, double confidence, ArrayList<Fact> sources) {
+        this.fact = fact;
+        this.confidence = confidence;
+        this.sources = sources;
+    }
+
+    public FactPlus(Fact fact, double confidence) {
+        this.fact = fact;
+        this.confidence = confidence;
+        sources = new ArrayList<>();
+    }
+
+    public Fact getFact() {
+        return fact;
+    }
+
+    public void setFact(Fact fact) {
+        this.fact = fact;
+    }
+
+    public double getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(double confidence) {
+        this.confidence = confidence;
+    }
+
+    public ArrayList<Fact> getSources() {
+        return sources;
+    }
+
+    public void setSources(ArrayList<Fact> sources) {
+        this.sources = sources;
+    }
 }
