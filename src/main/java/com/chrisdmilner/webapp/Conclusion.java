@@ -13,7 +13,7 @@ public class Conclusion {
 	public Conclusion(String name, String value, double confidence, ArrayList<Fact> sources) {
 		this.name = name;
 		this.value = value;
-		this.confidence = confidence;
+		this.confidence = Math.round(confidence * 10000d) / 10000d;
 		this.sources = sources;
 	}
 

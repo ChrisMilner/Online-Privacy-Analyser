@@ -55,39 +55,82 @@
             JSONObject curr;
             String name;
             String value;
+            JSONArray srcs;
             for (int i = 0; i < conclusions.length(); i++) {
                 curr = conclusions.getJSONObject(i);
                 name = curr.getString("name");
                 value = curr.getString("value");
+                srcs = curr.getJSONArray("sources");
             %>
 
-            <tr>
+            <tr data-srcno=<%= srcs.length() %>>
                 <td><%= name %></td>
                 <%
                     if (name.equals("Image URL")) {
-                    %> <td><a href=<%= value %>>Link</a></td> <%
+                        %> <td><a href=<%= value %>>Link</a></td> <%
                     } else {
                         %> <td><%= value %></td> <%
                     }
                 %>
                 <td><%= curr.getString("confidence") %></td>
-                <td class="sources" id=<%= i %>>Expand</td>
+                <td class="sources">Expand</td>
             </tr>
 
-            <div class="source-list" id=<%= "list-" + i %>>
-                <h2>Sources:</h2>
-                <ul>
-                <%
+            <%
+                for (int j = 0; j < srcs.length(); j++) {
+                    JSONObject src = srcs.getJSONObject(j);
+                    name = src.getString("name");
+                    value = src.getString("value");
+                    %>
 
-                    JSONArray sources = curr.getJSONArray("sources");
-                    for (int j = 0; j < sources.length(); j++) {
-                        %> <li> <%= sources.get(j) %> </li> <%
+                    <tr class="hidden sublevel1" data-srcno="1">
+                        <td><%= name %></td>
+                        <%
+                            if (name.equals("Image URL")) {
+                                %> <td><a href=<%= value %>>Link</a></td> <%
+                            } else {
+                                %> <td><%= value %></td> <%
+                            }
+                        %>
+                        <td>-</td>
+                        <td class="sources">Expand</td>
+                    </tr>
+
+                    <%
+
+                    JSONObject subsrc = src;
+                    while (subsrc.getJSONObject("source").has("source")) {
+                        subsrc = subsrc.getJSONObject("source");
+
+                        int srcno = 1;
+                        String sourceText = "Expand";
+                        if (!subsrc.getJSONObject("source").has("source")){
+                            srcno = 0;
+                            sourceText = "You";
+                        }
+
+                        name = subsrc.getString("name");
+                        value = subsrc.getString("value");
+
+                        %>
+
+                        <tr class="hidden sublevel2" data-srcno=<%= srcno %>>
+                            <td><%= name %></td>
+                            <%
+                                if (name.equals("Image URL")) {
+                                    %> <td><a href=<%= value %>>Link</a></td> <%
+                                } else {
+                                    %> <td><%= value %></td> <%
+                                }
+                            %>
+                            <td>-</td>
+                            <td class="sources"><%= sourceText %></td>
+                        </tr>
+
+                        <%
                     }
-
-                %>
-                </ul>
-                <h3>Hide</h3>
-            </div>
+                }
+            %>
 
             <%
 

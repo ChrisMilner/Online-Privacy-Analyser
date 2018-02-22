@@ -270,14 +270,19 @@ input[type="submit"]:hover {
 
 #conclusions tr {
 	height: 10vh;
-}
-
-#conclusions tr:nth-child(even) td {
     background-color: rgba(256, 256, 256, 0.2);
 }
 
-#conclusions tr:nth-child(odd) td {
-    background-color: rgba(256, 256, 256, 0.0);
+#conclusions tr.hidden {
+	display: none;
+}
+
+#conclusions tr.sublevel1 {
+    background-color: rgba(256, 256, 256, 0.4);
+}
+
+#conclusions tr.sublevel2 {
+    background-color: rgba(256, 256, 256, 0.6);
 }
 
 #conclusions td,
