@@ -30,7 +30,8 @@
         String json = "";
         try {
             json = Util.readFileToString(path + "output/" + id + ".data");
-            Util.deleteFile(path);
+            if (!Util.deleteFile(path + "output/" + id + ".data"))
+                System.err.println("Failed to delete the Data file " + id);
         } catch (FileNotFoundException e) {
             fileFound = false;
         }
