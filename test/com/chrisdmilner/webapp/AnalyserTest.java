@@ -67,15 +67,15 @@ public class AnalyserTest {
         f.addFact(new Fact<>("Name","Christopher David Milner", fbRoot));
         f.addFact(new Fact<>("Name", "christopher1997", fbRoot));
         f.addFact(new Fact<>("Name", "chris08", fbRoot));
+        f.addFact(new Fact<>("Name","Chris.Milner.97", fbRoot));
 
         // Cases to handle (hopefully).
         // f.addFact(new Fact<>("name", "Mr Chris Milner", fbRoot));
-        // f.addFact(new Fact<>("Name","Chris.Milner.97", fbRoot));
 
         Analyser.analyseName(f);
 
         ArrayList<Fact> fn = f.getFactsWithName("First Name");
-        assertEquals(7, fn.size());
+        assertEquals(8, fn.size());
         assertEquals("Chris", fn.get(0).getValue());
         assertEquals("Chris", fn.get(1).getValue());
         assertEquals("Chris", fn.get(2).getValue());
@@ -83,6 +83,7 @@ public class AnalyserTest {
         assertEquals("Christopher", fn.get(4).getValue());
         assertEquals("christopher", fn.get(5).getValue());
         assertEquals("chris", fn.get(6).getValue());
+        assertEquals("Chris", fn.get(7).getValue());
 
         ArrayList<Fact> mn = f.getFactsWithName("Middle Name");
         assertEquals(2, mn.size());
@@ -90,21 +91,22 @@ public class AnalyserTest {
         assertEquals("David", mn.get(1).getValue());
 
         ArrayList<Fact> ln = f.getFactsWithName("Last Name");
-        assertEquals(5, ln.size());
+        assertEquals(6, ln.size());
         assertEquals("Milner", ln.get(0).getValue());
         assertEquals("Milner", ln.get(1).getValue());
         assertEquals("milner", ln.get(2).getValue());
         assertEquals("m", ln.get(3).getValue());
         assertEquals("Milner", ln.get(4).getValue());
+        assertEquals("Milner", ln.get(5).getValue());
 
         ArrayList<Fact> bd = f.getFactsWithName("Birth Year");
-        assertEquals(3, bd.size());
-
         DateFormat df = new SimpleDateFormat("yyyy");
 
+        assertEquals(4, bd.size());
         assertEquals(df.parse("1997"), bd.get(0).getValue());
         assertEquals(df.parse("1997"), bd.get(1).getValue());
         assertEquals(df.parse("2008"), bd.get(2).getValue());
+        assertEquals(df.parse("1997"), bd.get(3).getValue());
 
         // Conclusion Analyser
         ArrayList<Conclusion> c = Analyser.analyseNameParts(f);
@@ -155,6 +157,11 @@ public class AnalyserTest {
         ArrayList<Conclusion> conclusions = Analyser.analyseBirthDate(f);
         assertEquals("1997", conclusions.get(0).getValue());
         assertEquals("20 - 21", conclusions.get(1).getValue());
+    }
+
+    @Test
+    public void smallFunctionTests() throws Exception {
+        assertEquals("chris", Analyser.removeNumbers("chris97"));
     }
 
 }

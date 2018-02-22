@@ -62,7 +62,7 @@ public class Analyser {
     }
 
     private static String[] tokeniseName(Fact<String> name) {
-        String value = (String) name.getValue();
+        String value = removeNumbers(name.getValue());
         ArrayList<String> tokens = new ArrayList<>();
 
         // Divide by spaces
@@ -79,7 +79,7 @@ public class Analyser {
         }
 
         for (String token : tokens) {
-            if (token.equals("")) tokens.remove(token);
+            if (token.isEmpty() || token.equals(" ")) tokens.remove(token);
         }
 
         return tokens.toArray(new String[tokens.size()]);
@@ -232,6 +232,10 @@ public class Analyser {
 
     private static String removeNonLetters(String s) {
         return s.replaceAll("[^a-zA-Z]", "");
+    }
+
+    protected static String removeNumbers(String s) {
+        return s.replaceAll("[0-9]", "");
     }
 
     protected static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
