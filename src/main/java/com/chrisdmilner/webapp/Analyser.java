@@ -148,11 +148,8 @@ public class Analyser {
         int i = 1;
         boolean similar;
         while (i < names.size()) {
-//            System.out.println("Comparing new name " + names.get(i).getValue());
             similar = false;
             for (int j = 0; j < i; j++) {
-//                System.out.println("Comparing with " + names.get(j).getValue());
-
                 String name1 = (String) names.get(i).getValue();
                 String name2 = (String) names.get(j).getValue();
 
@@ -272,7 +269,7 @@ public class Analyser {
 
             int y1 = Util.getYearFromDate(minDate);
             int y2 = Util.getYearFromDate(maxDate);
-            String year = (y1 - 1) + " - " + y2;
+            String year = y1 + " - " + y2;
             conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
 
             int currYear = Util.getCurrentYear();
@@ -368,9 +365,9 @@ public class Analyser {
         // Combine the confidences and sources of any duplicates.
         for (int i = 1; i < facts.size(); i++) {
             for (int j = 0; j < i; j++) {
-                System.out.println("Comparing " + j + ":" + facts.get(j).getValue() + " with " + i + ":" + facts.get(i).getValue());
+//                System.out.println("Comparing " + j + ":" + facts.get(j).getValue() + " with " + i + ":" + facts.get(i).getValue());
                 if (facts.get(i).getValue().equals(facts.get(j).getValue())) {
-                    System.out.println("Removing " + i);
+//                    System.out.println("Removing " + i);
                     confidences.set(j, confidences.get(i) + confidences.get(j));
                     sources.get(j).addAll(sources.get(i));
                     sources.remove(i);

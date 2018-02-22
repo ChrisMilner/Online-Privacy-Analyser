@@ -14,9 +14,9 @@ public class AnalyserTest {
     @org.junit.Test
     public void analyse() throws Exception {
         // Create the test data.
-        Fact fbRoot = new Fact<>("Facebook User ID", "100008177116719", null);
-        Fact twRoot = new Fact<>("Twitter Handle", "ChrisDMilner", null);
-        Fact rdRoot = new Fact<>("Reddit User Name", "Radioactive1997", null);
+        Fact fbRoot = new Fact<>("Facebook Account", "100008177116719", null);
+        Fact twRoot = new Fact<>("Twitter Account", "ChrisDMilner", null);
+        Fact rdRoot = new Fact<>("Reddit Account", "Radioactive1997", null);
 
         FactBook fb = new FactBook();
         fb.addFact(new Fact<>("Name", "chrism", twRoot));

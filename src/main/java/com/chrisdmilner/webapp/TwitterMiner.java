@@ -19,7 +19,7 @@ public class TwitterMiner {
         System.out.println("\n - STARTING TWITTER MINER - \n");
 
 		FactBook fb = new FactBook();
-		Fact rootFact = new Fact<>("Twitter Handle", screenName, null);
+		Fact rootFact = new Fact<>("Twitter Account", screenName, null);
 		fb.addFact(rootFact);
 
 		System.out.println("   Connecting to API and retrieving user data");

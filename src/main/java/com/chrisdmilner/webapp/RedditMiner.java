@@ -21,7 +21,7 @@ public class RedditMiner {
 	    System.out.println("\n - STARTING REDDIT MINER - \n");
 
 		FactBook fb = new FactBook();
-		Fact rootFact = new Fact<>("Reddit User Name", name, null);
+		Fact rootFact = new Fact<>("Reddit Account", name, null);
 		fb.addFact(rootFact);
 
 		System.out.println("   Connecting to API and retrieving user data");

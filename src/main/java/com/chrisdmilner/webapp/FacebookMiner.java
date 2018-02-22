@@ -15,7 +15,7 @@ public class FacebookMiner {
         System.out.println("\n - STARTING FACEBOOK MINER - \n");
 
 	    FactBook fs = new FactBook();
-	    Fact rootFact = new Fact<>("Facebook User ID", id, null);
+	    Fact rootFact = new Fact<>("Facebook Account", id, null);
         fs.addFact(rootFact);
 
         System.out.println("   Connecting to API and retrieving user data");
@@ -89,7 +89,7 @@ public class FacebookMiner {
 
             // Subtract the ages
             max.add(Calendar.YEAR, -u.getAgeRange().getMin());
-            min.add(Calendar.YEAR, - u.getAgeRange().getMax());
+            min.add(Calendar.YEAR, - (u.getAgeRange().getMax() + 1));
 
             // Parse the dates into facts.
             fs.addFact(new Fact<>("Max Birth Date", max.getTime(), rootFact));
