@@ -43,12 +43,15 @@ public class Analyser {
         System.out.println("   Analysing Images");
         conclusions.addAll(analyseImages(f));
 
+        System.out.println("   Analysing Gender");
+        conclusions.addAll(analyseGender(f));
+
         System.out.println("\n - ANALYSER FINISHED - \n");
 
         return conclusions;
     }
 
-    private static void analyseName(FactBook fb) {
+    protected static void analyseName(FactBook fb) {
         ArrayList<Fact> names = fb.getFactsWithName("Name");
 
         for (Fact name : names) {
@@ -121,7 +124,7 @@ public class Analyser {
         }
     }
 
-    private static ArrayList<Conclusion> analyseNameParts(FactBook f) {
+    protected static ArrayList<Conclusion> analyseNameParts(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
         String[] nameParts = {"First Name", "Middle Name", "Last Name"};
@@ -231,7 +234,7 @@ public class Analyser {
         return s.replaceAll("[^a-zA-Z]", "");
     }
 
-    private static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
+    protected static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
         ArrayList<Fact> sources = new ArrayList<>();
 
@@ -403,6 +406,35 @@ public class Analyser {
         }
 
         return  conclusions;
+    }
+
+    private static ArrayList<Conclusion> analyseGender(FactBook f) {
+        ArrayList<Conclusion> conclusions = new ArrayList<>();
+
+        ArrayList<Fact> sources = new ArrayList<>();
+        ArrayList<Fact> genders = f.getFactsWithName("Gender");
+
+        if (genders.isEmpty()) return conclusions;
+
+        for (int i = 0; i < genders.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                String g1 = (String) genders.get(i).getValue();
+                String g2 = (String) genders.get(j).getValue();
+                if (g1.equals(g2) || g1.charAt(0) == g2.charAt(0)) {
+                    if (g1.length() > g2.length()) {
+                        genders.remove(j);
+                    } else {
+                        genders.remove(i);
+                    }
+                    i--;
+                }
+            }
+        }
+
+        double confidence = 1;
+        String gender = Util.uppercaseFirstLetter((String) genders.get(0).getValue());
+        conclusions.add(new Conclusion("Gender", gender, confidence, sources));
+        return conclusions;
     }
 
     private static double getConfidenceFromSource(Fact source) {

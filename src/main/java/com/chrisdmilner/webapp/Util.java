@@ -114,4 +114,8 @@ public class Util {
         return c.get(Calendar.YEAR);
     }
 
+    public static String uppercaseFirstLetter(String s) {
+        return s.substring(0,1).toUpperCase() + s.substring(1);
+    }
+
 }
