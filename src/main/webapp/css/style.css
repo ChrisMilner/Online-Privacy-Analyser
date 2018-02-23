@@ -294,6 +294,7 @@ input[type="submit"]:hover {
 
 #conclusions th {
     font-weight: bold;
+    border-bottom: solid 4px rgb(100, 180, 250);
 }
 
 .sources {

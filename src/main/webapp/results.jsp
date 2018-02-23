@@ -56,11 +56,13 @@
             JSONObject curr;
             String name;
             String value;
+            String confidence;
             JSONArray srcs;
             for (int i = 0; i < conclusions.length(); i++) {
                 curr = conclusions.getJSONObject(i);
                 name = curr.getString("name");
                 value = curr.getString("value");
+                confidence = (Double.parseDouble(curr.getString("confidence")) * 100) + "%";
                 srcs = curr.getJSONArray("sources");
             %>
 
@@ -73,7 +75,7 @@
                         %> <td><%= value %></td> <%
                     }
                 %>
-                <td><%= curr.getString("confidence") %></td>
+                <td><%= confidence %></td>
                 <td class="sources">Expand</td>
             </tr>
 
