@@ -118,4 +118,12 @@ public class Util {
         return s.substring(0,1).toUpperCase() + s.substring(1);
     }
 
+    public static String removeNonLetters(String s) {
+        return s.replaceAll("[^a-zA-Z]", "");
+    }
+
+    public static String removeNumbers(String s) {
+        return s.replaceAll("[0-9]", "");
+    }
+
 }

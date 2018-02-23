@@ -54,7 +54,7 @@ public class Analyser {
     protected static void analyseName(FactBook fb) {
         ArrayList<Fact> names = fb.getFactsWithName("Name");
 
-        for (Fact name : names) {
+        for (Fact<String> name : names) {
             String[] tokens = tokeniseName(name);
             addNameTokens(fb, tokens, name);
             findBirthYear(fb, name);
@@ -62,7 +62,7 @@ public class Analyser {
     }
 
     private static String[] tokeniseName(Fact<String> name) {
-        String value = removeNumbers(name.getValue());
+        String value = Util.removeNumbers(name.getValue());
         ArrayList<String> tokens = new ArrayList<>();
 
         // Divide by spaces
@@ -83,6 +83,25 @@ public class Analyser {
         }
 
         return tokens.toArray(new String[tokens.size()]);
+    }
+
+    private static void addNameTokens(FactBook fb, String[] tokens, Fact source) {
+        // TODO: Handle title e.g. Mr
+
+        for (int i = 0; i < tokens.length; i++) {
+            tokens[i] = Util.removeNonLetters(tokens[i]);
+        }
+
+        fb.addFact(new Fact<>("First Name", tokens[0], source));
+
+        if (tokens.length == 1) return;
+
+        fb.addFact(new Fact<>("Last Name", tokens[tokens.length - 1], source));
+
+        if (tokens.length > 2) {
+            for (int i = 1; i < tokens.length - 1; i++)
+                fb.addFact(new Fact<>("Middle Name", tokens[i], source));
+        }
     }
 
     private static void findBirthYear(FactBook fb, Fact<String> name) {
@@ -107,23 +126,6 @@ public class Analyser {
         }
     }
 
-    private static void addNameTokens(FactBook fb, String[] tokens, Fact source) {
-        for (int i = 0; i < tokens.length; i++) {
-            tokens[i] = removeNonLetters(tokens[i]);
-        }
-
-        fb.addFact(new Fact<>("First Name", tokens[0], source));
-
-        if (tokens.length == 1) return;
-
-        fb.addFact(new Fact<>("Last Name", tokens[tokens.length - 1], source));
-
-        if (tokens.length > 2) {
-            for (int i = 1; i < tokens.length - 1; i++)
-                fb.addFact(new Fact<>("Middle Name", tokens[i], source));
-        }
-    }
-
     protected static ArrayList<Conclusion> analyseNameParts(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
@@ -139,80 +141,16 @@ public class Analyser {
     }
 
     private static Conclusion analyseNamePart(FactBook f, String namePart) {
+        // TODO: Handle multiple middle names.
+
         // Get the facts for the given name part.
         ArrayList<Fact> names = f.getFactsWithName(namePart);
         if (names.isEmpty()) return null;
 
-        // Add the initial source fact to the first conclusion candidate.
-        ArrayList<ArrayList> sources = new ArrayList<>();
-        sources.add(new ArrayList<Fact>());
-        sources.get(0).add(names.get(0));
-
-        int i = 1;
-        boolean similar;
-        while (i < names.size()) {
-            similar = false;
-            for (int j = 0; j < i; j++) {
-                String name1 = (String) names.get(i).getValue();
-                String name2 = (String) names.get(j).getValue();
-
-                if (name1.equals(name2)) {
-                    sources.get(j).add(names.get(i));
-                    names.remove(i);
-                    similar = true;
-                    break;
-                } else if (name1.contains(name2)) {
-                    similar = true;
-                    boolean decision = decideBetweenNames(namePart, name1, name2);
-                    if (decision) {
-                        sources.remove(j);
-                        sources.add(new ArrayList<Fact>());
-                        sources.get(i-1).add(names.get(i));
-                        names.remove(j);
-                    } else {
-                        sources.get(j).add(names.get(i));
-                        names.remove(i);
-                    }
-                    break;
-                } else if (name2.contains(name1)) {
-                    similar = true;
-                    boolean decision = decideBetweenNames(namePart, name2, name1);
-                    if (decision) {
-                        sources.get(j).add(names.get(i));
-                        names.remove(i);
-                    } else {
-                        sources.remove(j);
-                        sources.add(new ArrayList<Fact>());
-                        sources.get(i-1).add(names.get(i));
-                        names.remove(j);
-                    }
-                    break;
-                }
-            }
-
-            if (!similar) {
-                sources.add(new ArrayList<Fact>());
-                sources.get(i).add(names.get(i));
-                i++;
-            }
-        }
-
-        FactPlus bestNameFP = getGreatestWeightedConfidence(names);
-        Fact bestName = bestNameFP.getFact();
-        double greatestConf = bestNameFP.getConfidence();
-        int greatestIndex = names.indexOf(bestName);
-
-        return new Conclusion(namePart, (String) bestName.getValue(), greatestConf, sources.get(greatestIndex));
-    }
-
-    private static boolean decideBetweenNames(String namePart, String n1, String n2) {
-        boolean n1Recognised = isNameRecognised(namePart, n1);
-        boolean n2Recognised = isNameRecognised(namePart, n2);
-
-        // If both are recognisable or both unrecognisable then take the first one (the larger).
-        if ((!n1Recognised && !n2Recognised) || (n1Recognised && n2Recognised)) return true;
-        // If the smaller is the only recognisable one take the smaller. Otherwise take the larger.
-        else return n1Recognised;
+        ArrayList<Conclusion> conclusions = factsToConclusions(names);
+        combineEqualConclusions(conclusions);
+        combineContainedNameConclusions(conclusions);
+        return getHighestConfidenceConclusion(conclusions);
     }
 
     private static boolean isNameRecognised(String namePart, String potentialName) {
@@ -228,14 +166,6 @@ public class Analyser {
             }
         }
         return false;
-    }
-
-    private static String removeNonLetters(String s) {
-        return s.replaceAll("[^a-zA-Z]", "");
-    }
-
-    protected static String removeNumbers(String s) {
-        return s.replaceAll("[0-9]", "");
     }
 
     protected static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
@@ -258,18 +188,18 @@ public class Analyser {
 
         // Combine the remaining birth years to get a final answer.
         if (!birthYears.isEmpty()) {
-            FactPlus bestYearFP = getGreatestWeightedConfidence(birthYears);
-            Fact bestYear = bestYearFP.getFact();
-            double confidence = bestYearFP.getConfidence();
-            sources.addAll(bestYearFP.getSources());
+            ArrayList<Conclusion> cs = factsToConclusions(birthYears);
+            combineEqualConclusions(cs);
+            Conclusion bestYear = getHighestConfidenceConclusion(cs);
+            sources.addAll(bestYear.getSources());
 
             int yearInt = Util.getYearFromDate((Date) bestYear.getValue());
             String year = Integer.toString(yearInt);
-            conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
+            conclusions.add(new Conclusion<>("Birth Year", year, bestYear.getConfidence(), sources));
 
             int maxAge = Util.getCurrentYear() - yearInt;
             String age = (maxAge - 1) + " - " + maxAge;
-            conclusions.add(new Conclusion("Age", age, confidence, sources));
+            conclusions.add(new Conclusion<>("Age", age, bestYear.getConfidence(), sources));
         } else if (maxFact != null && minFact != null) {
             double confidence = getConfidenceFromSource(maxFact.getSource());
             confidence *= getConfidenceFromSource(minFact.getSource());
@@ -277,11 +207,11 @@ public class Analyser {
             int y1 = Util.getYearFromDate(minDate);
             int y2 = Util.getYearFromDate(maxDate);
             String year = y1 + " - " + y2;
-            conclusions.add(new Conclusion("Birth Year", year, confidence, sources));
+            conclusions.add(new Conclusion<>("Birth Year", year, confidence, sources));
 
             int currYear = Util.getCurrentYear();
             String age = (currYear - y2) + " - " + (currYear - y1);
-            conclusions.add(new Conclusion("Age", age, confidence, sources));
+            conclusions.add(new Conclusion<>("Age", age, confidence, sources));
         } else if (maxFact != null) {
             int currYear = Util.getCurrentYear();
             int maxYear = Util.getYearFromDate(maxDate);
@@ -289,7 +219,7 @@ public class Analyser {
             int minAge = currYear - maxYear;
             String age = minAge + " or Over";
             double confidence = getConfidenceFromSource(maxFact.getSource());
-            conclusions.add(new Conclusion("Age", age, confidence, sources));
+            conclusions.add(new Conclusion<>("Age", age, confidence, sources));
         } else if (minFact != null) {
             int currYear = Util.getCurrentYear();
             int maxYear = Util.getYearFromDate(minDate);
@@ -297,7 +227,7 @@ public class Analyser {
             int maxAge = currYear - maxYear;
             String age = maxAge + " or Under";
             double confidence = getConfidenceFromSource(minFact.getSource());
-            conclusions.add(new Conclusion("Age", age, confidence, sources));
+            conclusions.add(new Conclusion<>("Age", age, confidence, sources));
         }
 
         return conclusions;
@@ -354,49 +284,6 @@ public class Analyser {
         return dates;
     }
 
-    private static FactPlus getGreatestWeightedConfidence(ArrayList<Fact> facts) {
-        ArrayList<Double> confidences = new ArrayList<>();
-        ArrayList<ArrayList> sources = new ArrayList<>();
-
-        // Get all of the confidences into the list and get the total.
-        double conf;
-        double total = 0;
-        for (int i = 0; i < facts.size(); i++) {
-            sources.add(new ArrayList<Fact>());
-            sources.get(i).add(facts.get(i));
-            conf = getConfidenceFromSource(facts.get(i).getSource());
-            confidences.add(conf);
-            total += conf;
-        }
-
-        // Combine the confidences and sources of any duplicates.
-        for (int i = 1; i < facts.size(); i++) {
-            for (int j = 0; j < i; j++) {
-//                System.out.println("Comparing " + j + ":" + facts.get(j).getValue() + " with " + i + ":" + facts.get(i).getValue());
-                if (facts.get(i).getValue().equals(facts.get(j).getValue())) {
-//                    System.out.println("Removing " + i);
-                    confidences.set(j, confidences.get(i) + confidences.get(j));
-                    sources.get(j).addAll(sources.get(i));
-                    sources.remove(i);
-                    confidences.remove(i);
-                    facts.remove(i--);
-                }
-            }
-        }
-
-        double greatestConf = 0;
-        int greatestIndex = -1;
-        for (int i = 0; i < confidences.size(); i++) {
-            confidences.set(i, confidences.get(i) / total);
-            if (confidences.get(i) > greatestConf) {
-                greatestConf = confidences.get(i);
-                greatestIndex = i;
-            }
-        }
-
-        return new FactPlus(facts.get(greatestIndex), greatestConf, sources.get(greatestIndex));
-    }
-
     private static ArrayList<Conclusion> analyseImages(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
@@ -406,7 +293,7 @@ public class Analyser {
             double confidence =  getConfidenceFromSource(url.getSource());
             ArrayList<Fact> sources = new ArrayList<>();
             sources.add(url);
-            conclusions.add(new Conclusion("Image URL", (String) url.getValue(), confidence, sources));
+            conclusions.add(new Conclusion<>("Image URL", (String) url.getValue(), confidence, sources));
         }
 
         return  conclusions;
@@ -437,8 +324,100 @@ public class Analyser {
 
         double confidence = 1;
         String gender = Util.uppercaseFirstLetter((String) genders.get(0).getValue());
-        conclusions.add(new Conclusion("Gender", gender, confidence, sources));
+        conclusions.add(new Conclusion<>("Gender", gender, confidence, sources));
         return conclusions;
+    }
+
+    private static ArrayList<Conclusion> factsToConclusions(ArrayList<Fact> facts) {
+        ArrayList<Conclusion> conclusions = new ArrayList<>();
+
+        // Convert facts to conclusions, set initial confidences and get the total confidence.
+        double total = 0;
+        for (Fact f : facts) {
+            ArrayList<Fact> sources = new ArrayList<>();
+            sources.add(f);
+            double confidence = getConfidenceFromSource(f.getSource());
+            total += confidence;
+            conclusions.add(new Conclusion<>(f.getName(), f.getValue(), confidence, sources));
+        }
+
+        // Normalise the confidences.
+        for (Conclusion c : conclusions) {
+            c.setConfidence(c.getConfidence() / total);
+        }
+
+        return conclusions;
+    }
+
+    private static void combineEqualConclusions(ArrayList<Conclusion> conclusions) {
+        // Compare all conclusions and combine the duplicates.
+        for (int i = 1; i < conclusions.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                Object s1 = conclusions.get(i).getValue();
+                Object s2 = conclusions.get(j).getValue();
+                if (s1.equals(s2)) {
+                    conclusions.get(j).addSources(conclusions.get(i).getSources());
+                    conclusions.get(j).setConfidence(conclusions.get(j).getConfidence() + conclusions.get(i).getConfidence());
+                    conclusions.remove(i--);
+                }
+            }
+        }
+    }
+
+    private static void combineContainedNameConclusions(ArrayList<Conclusion> conclusions) {
+        for (int i = 1; i < conclusions.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                String s1 = (String) conclusions.get(i).getValue();
+                String s2 = (String) conclusions.get(j).getValue();
+                boolean decision = false;
+                boolean contains = false;
+                if (s1.contains(s2)) {
+                    contains = true;
+                    decision = decideBetweenNames(conclusions.get(i).getName(), s1, s2);
+                } else if (s2.contains(s1)) {
+                    contains = true;
+                    decision = decideBetweenNames(conclusions.get(i).getName(), s2, s1);
+                }
+
+                if (contains) {
+                    if (decision) {
+                        conclusions.get(i).addSources(conclusions.get(j).getSources());
+                        conclusions.get(i).setConfidence(conclusions.get(i).getConfidence() + conclusions.get(j).getConfidence());
+                        conclusions.remove(j);
+                    } else {
+                        conclusions.get(j).addSources(conclusions.get(i).getSources());
+                        conclusions.get(j).setConfidence(conclusions.get(j).getConfidence() + conclusions.get(i).getConfidence());
+                        conclusions.remove(i);
+                    }
+                    i--; j--;
+                }
+            }
+        }
+    }
+
+    private static boolean decideBetweenNames(String namePart, String n1, String n2) {
+        boolean n1Recognised = isNameRecognised(namePart, n1);
+        boolean n2Recognised = isNameRecognised(namePart, n2);
+
+        // If both are recognisable or both unrecognisable then take the first one (the larger).
+        if ((!n1Recognised && !n2Recognised) || (n1Recognised && n2Recognised)) return true;
+        // If the smaller is the only recognisable one take the smaller. Otherwise take the larger.
+        else return n1Recognised;
+    }
+
+    private static Conclusion getHighestConfidenceConclusion(ArrayList<Conclusion> conclusions) {
+        if (conclusions.isEmpty()) return null;
+
+        double highestConfidence = 0;
+        int index = -1;
+        for (int i = 0; i < conclusions.size(); i++) {
+            if (conclusions.get(i).getConfidence() > highestConfidence) {
+                highestConfidence = conclusions.get(i).getConfidence();
+                index = i;
+            }
+        }
+
+        return conclusions.get(index);
     }
 
     private static double getConfidenceFromSource(Fact source) {
@@ -462,47 +441,4 @@ public class Analyser {
         return confidence;
     }
 
-}
-
-class FactPlus {
-
-    private Fact fact;
-    private double confidence;
-    private ArrayList<Fact> sources;
-
-    public FactPlus(Fact fact, double confidence, ArrayList<Fact> sources) {
-        this.fact = fact;
-        this.confidence = confidence;
-        this.sources = sources;
-    }
-
-    public FactPlus(Fact fact, double confidence) {
-        this.fact = fact;
-        this.confidence = confidence;
-        sources = new ArrayList<>();
-    }
-
-    public Fact getFact() {
-        return fact;
-    }
-
-    public void setFact(Fact fact) {
-        this.fact = fact;
-    }
-
-    public double getConfidence() {
-        return confidence;
-    }
-
-    public void setConfidence(double confidence) {
-        this.confidence = confidence;
-    }
-
-    public ArrayList<Fact> getSources() {
-        return sources;
-    }
-
-    public void setSources(ArrayList<Fact> sources) {
-        this.sources = sources;
-    }
 }

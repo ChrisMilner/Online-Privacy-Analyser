@@ -159,9 +159,9 @@ public class AnalyserTest {
         assertEquals("20 - 21", conclusions.get(1).getValue());
     }
 
-    @Test
-    public void smallFunctionTests() throws Exception {
-        assertEquals("chris", Analyser.removeNumbers("chris97"));
-    }
+//    @Test
+//    public void smallFunctionTests() throws Exception {
+//        assertEquals("chris", Analyser.removeNumbers("chris97"));
+//    }
 
 }
