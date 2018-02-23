@@ -333,17 +333,19 @@ public class Analyser {
 
         // Convert facts to conclusions, set initial confidences and get the total confidence.
         double total = 0;
+        double incorrectProb = 1.0;
         for (Fact f : facts) {
             ArrayList<Fact> sources = new ArrayList<>();
             sources.add(f);
             double confidence = getConfidenceFromSource(f.getSource());
             total += confidence;
+            incorrectProb *= (1.0 - confidence);
             conclusions.add(new Conclusion<>(f.getName(), f.getValue(), confidence, sources));
         }
 
         // Normalise the confidences.
         for (Conclusion c : conclusions) {
-            c.setConfidence(c.getConfidence() / total);
+            c.setConfidence((c.getConfidence() / total) * (1 - incorrectProb));
         }
 
         return conclusions;
@@ -428,9 +430,9 @@ public class Analyser {
         Fact s = source;
         while (s != null) {
             switch (s.getName()) {
-                case "Facebook User ID":    confidence *= 0.95; break;
-                case "Twitter Handle":      confidence *= 0.7; break;
-                case "Reddit User Name":    confidence *= 0.4; break;
+                case "Facebook Account":    confidence *= 0.95; break;
+                case "Twitter Account":      confidence *= 0.7; break;
+                case "Reddit Account":    confidence *= 0.4; break;
 
                 default: confidence *= 1;
             }
