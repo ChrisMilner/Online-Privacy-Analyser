@@ -14,7 +14,6 @@ public class Analyser {
     //  - Text Posts
     //  - Locations
     //  - Email(s)
-    //  - Gender
     //  - Interests
     //  - Politics
     //  - Religion
@@ -23,6 +22,7 @@ public class Analyser {
     //  - Jobs
     //  - Lanuages
     //  - Friends
+    //  - Birth Month and Day
 
     private final static int CURRENT_YEAR = 2018;
 
@@ -33,6 +33,9 @@ public class Analyser {
 
         System.out.println("   Breaking down Name Parts");
         analyseName(f);
+
+        System.out.println("   Analysing Account Creation Dates");
+        analyseCreatedAtDates(f);
 
         System.out.println("   Analysing the Name Parts");
         conclusions.addAll(analyseNameParts(f));
@@ -125,6 +128,14 @@ public class Analyser {
                 System.err.println("ERROR converting date to correct format: yyyy");
                 e.printStackTrace();
             }
+        }
+    }
+
+    private static void analyseCreatedAtDates(FactBook f) {
+        ArrayList<Fact> dates = f.getFactsWithName("Account Created Date");
+
+        for (Fact date : dates) {
+            f.addFact(new Fact<>("Max Birth Date", date.getValue(), date));
         }
     }
 

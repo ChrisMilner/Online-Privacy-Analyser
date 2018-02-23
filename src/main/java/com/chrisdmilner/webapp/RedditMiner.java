@@ -37,7 +37,7 @@ public class RedditMiner {
 		System.out.println("   Processing the user's profile data");
 
 		fb.addFact(new Fact<>("Name", name, rootFact));
-		fb.addFact(new Fact<>("Max Birth Date", account.getCreated(), rootFact));
+		fb.addFact(new Fact<>("Account Created Date", account.getCreated(), rootFact));
 
         System.out.println("   Processing the user's comments");
 		DefaultPaginator<PublicContribution<?>> commentPaginator = user.history("comments").build();

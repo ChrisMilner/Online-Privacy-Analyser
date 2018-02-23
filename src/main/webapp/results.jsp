@@ -164,5 +164,8 @@
 
     %>
 
+    <div class="footer">
+        <a href="privacy.html">Privacy Policy</a>
+    </div>
 </body>
 </html>

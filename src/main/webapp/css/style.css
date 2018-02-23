@@ -223,6 +223,33 @@ input[type="submit"]:hover {
     margin-bottom: 2vh;
 }
 
+.footer {
+	margin-bottom: 2vh;
+}
+
+/* =========================================================== */
+/*                         Privacy                             */
+/* =========================================================== */
+
+.privacy-section {
+    margin: 2vh auto 2vh auto;
+    padding: 2vh;
+    width: 70%;
+}
+
+.privacy-section h2 {
+    font-size: 5vh;
+    font-weight: bold;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 2vh;
+    margin-top: 1vh;
+}
+
+.privacy-section p {
+    font-size: 2vh;
+    line-height: 1.5em;
+}
+
 /* =========================================================== */
 /*                         Analyse                             */
 /* =========================================================== */

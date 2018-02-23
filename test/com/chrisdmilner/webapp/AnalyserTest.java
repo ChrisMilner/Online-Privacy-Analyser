@@ -32,7 +32,7 @@ public class AnalyserTest {
 
         try {
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-            fb.addFact(new Fact<>("Max Birth Date", df.parse("17/08/2005"), fbRoot));
+            fb.addFact(new Fact<>("Account Created Date", df.parse("17/08/2005"), fbRoot));
             fb.addFact(new Fact<>("Min Birth Date", df.parse("17/08/1995"), fbRoot));
             fb.addFact(new Fact<>("Birth Year", df.parse("01/01/1997"), fbRoot));
         } catch (ParseException e) {

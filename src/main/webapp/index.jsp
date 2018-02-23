@@ -102,5 +102,9 @@
             <input type="hidden" name="access-token" id="access-token">
         </form>
     </div>
+
+    <div class="footer">
+        <a href="privacy.html">Privacy Policy</a>
+    </div>
 </body>
 </html>
