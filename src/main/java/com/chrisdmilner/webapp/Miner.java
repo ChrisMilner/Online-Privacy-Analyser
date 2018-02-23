@@ -24,6 +24,9 @@ public class Miner {
 		FactBook rdf = new FactBook();
 		if (!rd.equals("")) {
 			String rdName = rd.substring(rd.lastIndexOf("user/") + 5);
+			if (rdName.charAt(rdName.length() - 1) == '/')
+			    rdName = rdName.substring(0, rdName.length() - 1);
+
 			rdf = RedditMiner.mine(rdName);
 		}
 

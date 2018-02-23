@@ -8,7 +8,8 @@ import org.junit.runners.Suite;
         FacebookMinerTest.class,
         TwitterMinerTest.class,
         RedditMinerTest.class,
-        AnalyserTest.class
+        AnalyserTest.class,
+        MinerTest.class
 })
 
 public class FullTest {}

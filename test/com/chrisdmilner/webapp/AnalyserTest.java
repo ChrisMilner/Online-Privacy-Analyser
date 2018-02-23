@@ -133,6 +133,7 @@ public class AnalyserTest {
                 assertEquals("Milner", c.getValue());
             else if (c.getName().equals("Gender"))
                 assertEquals("Male", c.getValue());
+            System.out.println(c.toString());
         }
     }
 
