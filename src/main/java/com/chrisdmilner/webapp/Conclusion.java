@@ -30,7 +30,7 @@ public class Conclusion<T> {
 	}
 
 	public void setConfidence(double confidence) {
-		this.confidence = confidence;
+		this.confidence = Math.round(confidence * 10000d) / 10000d;
 	}
 
 	public ArrayList<Fact> getSources() {

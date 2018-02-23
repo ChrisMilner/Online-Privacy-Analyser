@@ -1,5 +1,6 @@
 var OPEN_SOURCE_TEXT = "Expand";
 var CLOSE_SOURCE_TEXT = "Close";
+var NO_SOURCE_TEXT = "You";
 
 window.onload = function () {
     var sources = document.getElementsByClassName("sources")
@@ -9,7 +10,9 @@ window.onload = function () {
         sources[i].onclick = function () {
             var row = this.parentElement;
 
-            if (this.innerHTML === OPEN_SOURCE_TEXT)
+            if (this.innerHTML === NO_SOURCE_TEXT)
+                return;
+            else if (this.innerHTML === OPEN_SOURCE_TEXT)
                 openSources(row);
             else
                 closeSources(row);
