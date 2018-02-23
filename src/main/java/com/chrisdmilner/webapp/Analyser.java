@@ -37,16 +37,16 @@ public class Analyser {
         System.out.println("   Analysing the Name Parts");
         conclusions.addAll(analyseNameParts(f));
 
+        System.out.println("   Analysing Gender");
+        Conclusion gender = analyseGender(f);
+        if (gender != null)
+            conclusions.add(gender);
+
         System.out.println("   Analysing Birth Dates");
         conclusions.addAll(analyseBirthDate(f));
 
         System.out.println("   Analysing Images");
         conclusions.addAll(analyseImages(f));
-
-        System.out.println("   Analysing Gender");
-        Conclusion gender = analyseGender(f);
-        if (gender != null)
-            conclusions.add(gender);
 
         System.out.println("\n - ANALYSER FINISHED - \n");
 
@@ -365,15 +365,19 @@ public class Analyser {
                     decision = decideBetweenNames(conclusions.get(i).getName(), s1, s2);
                 } else if (s2.contains(s1)) {
                     contains = true;
-                    decision = decideBetweenNames(conclusions.get(i).getName(), s2, s1);
+                    decision = !decideBetweenNames(conclusions.get(i).getName(), s2, s1);
                 }
 
                 if (contains) {
+                    System.out.println("Comparing " + s1 + " and " + s2);
+
                     if (decision) {
+                        System.out.println("Keeping " + s1);
                         conclusions.get(i).addSources(conclusions.get(j).getSources());
                         conclusions.get(i).setConfidence(conclusions.get(i).getConfidence() + conclusions.get(j).getConfidence());
                         conclusions.remove(j);
                     } else {
+                        System.out.println("Keeping " + s2);
                         conclusions.get(j).addSources(conclusions.get(i).getSources());
                         conclusions.get(j).setConfidence(conclusions.get(j).getConfidence() + conclusions.get(i).getConfidence());
                         conclusions.remove(i);
@@ -387,6 +391,9 @@ public class Analyser {
     private static boolean decideBetweenNames(String namePart, String n1, String n2) {
         boolean n1Recognised = isNameRecognised(namePart, n1);
         boolean n2Recognised = isNameRecognised(namePart, n2);
+
+        System.out.println("Deciding between " + n1 + " and " + n2);
+        System.out.println(n1Recognised + " and " + n2Recognised);
 
         // If both are recognisable or both unrecognisable then take the first one (the larger).
         if ((!n1Recognised && !n2Recognised) || (n1Recognised && n2Recognised)) return true;
