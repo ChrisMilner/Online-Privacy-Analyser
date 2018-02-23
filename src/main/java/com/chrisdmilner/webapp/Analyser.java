@@ -44,7 +44,9 @@ public class Analyser {
         conclusions.addAll(analyseImages(f));
 
         System.out.println("   Analysing Gender");
-        conclusions.addAll(analyseGender(f));
+        Conclusion gender = analyseGender(f);
+        if (gender != null)
+            conclusions.add(gender);
 
         System.out.println("\n - ANALYSER FINISHED - \n");
 
@@ -299,33 +301,18 @@ public class Analyser {
         return  conclusions;
     }
 
-    private static ArrayList<Conclusion> analyseGender(FactBook f) {
-        ArrayList<Conclusion> conclusions = new ArrayList<>();
-
+    private static Conclusion<String> analyseGender(FactBook f) {
         ArrayList<Fact> sources = new ArrayList<>();
         ArrayList<Fact> genders = f.getFactsWithName("Gender");
 
-        if (genders.isEmpty()) return conclusions;
+        if (genders.isEmpty()) return null;
 
-        for (int i = 0; i < genders.size(); i++) {
-            for (int j = 0; j < i; j++) {
-                String g1 = (String) genders.get(i).getValue();
-                String g2 = (String) genders.get(j).getValue();
-                if (g1.equals(g2) || g1.charAt(0) == g2.charAt(0)) {
-                    if (g1.length() > g2.length()) {
-                        genders.remove(j);
-                    } else {
-                        genders.remove(i);
-                    }
-                    i--;
-                }
-            }
-        }
+        ArrayList<Conclusion> conclusions = factsToConclusions(genders);
+        combineEqualConclusions(conclusions);
+        Conclusion c = getHighestConfidenceConclusion(conclusions);
 
-        double confidence = 1;
-        String gender = Util.uppercaseFirstLetter((String) genders.get(0).getValue());
-        conclusions.add(new Conclusion<>("Gender", gender, confidence, sources));
-        return conclusions;
+        String value = Util.uppercaseFirstLetter((String) c.getValue());
+        return new Conclusion<String>(c.getName(), value, c.getConfidence(), c.getSources());
     }
 
     private static ArrayList<Conclusion> factsToConclusions(ArrayList<Fact> facts) {
