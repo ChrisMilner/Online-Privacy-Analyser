@@ -39,9 +39,13 @@ function openSources(row) {
 }
 
 function closeSources(row) {
-    row.getElementsByClassName("sources")[0].innerHTML = OPEN_SOURCE_TEXT;
-
     var srcno = row.getAttribute("data-srcno");
+
+    if (srcno == 0) {
+        row.getElementsByClassName("sources")[0].innerHTML = NO_SOURCE_TEXT;
+        return;
+    } else
+        row.getElementsByClassName("sources")[0].innerHTML = OPEN_SOURCE_TEXT;
 
     row = row.nextElementSibling;
     for (var i = 0; i < srcno; i++) {

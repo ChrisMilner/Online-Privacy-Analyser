@@ -369,15 +369,11 @@ public class Analyser {
                 }
 
                 if (contains) {
-                    System.out.println("Comparing " + s1 + " and " + s2);
-
                     if (decision) {
-                        System.out.println("Keeping " + s1);
                         conclusions.get(i).addSources(conclusions.get(j).getSources());
                         conclusions.get(i).setConfidence(conclusions.get(i).getConfidence() + conclusions.get(j).getConfidence());
                         conclusions.remove(j);
                     } else {
-                        System.out.println("Keeping " + s2);
                         conclusions.get(j).addSources(conclusions.get(i).getSources());
                         conclusions.get(j).setConfidence(conclusions.get(j).getConfidence() + conclusions.get(i).getConfidence());
                         conclusions.remove(i);
@@ -391,9 +387,6 @@ public class Analyser {
     private static boolean decideBetweenNames(String namePart, String n1, String n2) {
         boolean n1Recognised = isNameRecognised(namePart, n1);
         boolean n2Recognised = isNameRecognised(namePart, n2);
-
-        System.out.println("Deciding between " + n1 + " and " + n2);
-        System.out.println(n1Recognised + " and " + n2Recognised);
 
         // If both are recognisable or both unrecognisable then take the first one (the larger).
         if ((!n1Recognised && !n2Recognised) || (n1Recognised && n2Recognised)) return true;
