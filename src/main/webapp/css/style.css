@@ -69,6 +69,14 @@ body {
 	margin: 6vh;
 }
 
+.subtitle {
+    font-size: 4vw;
+    font-weight: bold;
+    color: rgba(255,255,255,0.8);
+
+    margin: 2vh;
+}
+
 #description {
 	font-size: calc(1em + 0.4vw);
 	color: rgba(0,0,0,0.6);
@@ -333,53 +341,19 @@ input[type="submit"]:hover {
     background-color: rgba(256, 256, 256, 0.6);
 }
 
-div.source-list {
-    position: fixed;
-    top: 50%;
-    left: 125%;
-    -webkit-transform: translate(-50%,-50%);
-    -moz-transform: translate(-50%,-50%);
-    -ms-transform: translate(-50%,-50%);
-    -o-transform: translate(-50%,-50%);
-    transform: translate(-50%,-50%);
-
-    width: 40%;
-    /*height: 60%;*/
-
-    padding: 1vw;
-
-    background-color: rgba(220, 220, 220, 0.8);
-    border: solid 2px black;
-
-    font-size: 2vw;
-
-    -webkit-transition: left 1s;
-    -moz-transition: left 1s;
-    -ms-transition: left 1s;
-    -o-transition: left 1s;
-    transition: left 1s;
+#images {
+    width: 90%;
+    border-collapse: collapse;
+    margin: auto;
+    margin-bottom: 10vh;
 }
 
-div.source-list.centered {
-    left: 50%;
+#images td {
+    vertical-align: middle;
 }
 
-div.source-list h2 {
-    margin-bottom: 2vh;
-    font-size: 4vw;
-}
-
-div.source-list li {
-    padding-bottom: 10px;
-}
-
-div.source-list h3 {
-    padding-top: 10px;
-}
-
-div.source-list h3:hover {
-    text-decoration: underline;
-    cursor: pointer;
+#images img {
+    max-width: 100%;
 }
 
 div#error {

@@ -3,6 +3,7 @@
 <%@ page import="org.json.JSONException" %>
 <%@ page import="org.json.JSONObject" %>
 <%@ page import="java.io.FileNotFoundException" %>
+<%@ page import="java.util.ArrayList" %>
 <!doctype html>
 
 <html lang="en">
@@ -53,6 +54,8 @@
 
             JSONArray conclusions = new JSONObject(json).getJSONArray("conclusions");
 
+            ArrayList<JSONObject> images = new ArrayList<JSONObject>();
+
             JSONObject curr;
             String name;
             String value;
@@ -61,6 +64,12 @@
             for (int i = 0; i < conclusions.length(); i++) {
                 curr = conclusions.getJSONObject(i);
                 name = curr.getString("name");
+
+                if (name.equals("Image URL")) {
+                    images.add(curr);
+                    continue;
+                }
+
                 value = curr.getString("value");
                 confidence = (Double.parseDouble(curr.getString("confidence")) * 100) + "%";
                 srcs = curr.getJSONArray("sources");
@@ -68,13 +77,7 @@
 
             <tr data-srcno=<%= srcs.length() %>>
                 <td><%= name %></td>
-                <%
-                    if (name.equals("Image URL")) {
-                        %> <td><a href=<%= value %>>Link</a></td> <%
-                    } else {
-                        %> <td><%= value %></td> <%
-                    }
-                %>
+                <td><%= value %></td>
                 <td><%= confidence %></td>
                 <td class="sources">Expand</td>
             </tr>
@@ -83,18 +86,14 @@
                 for (int j = 0; j < srcs.length(); j++) {
                     JSONObject src = srcs.getJSONObject(j);
                     name = src.getString("name");
+
                     value = src.getString("value");
                     %>
 
                     <tr class="hidden sublevel1" data-srcno="1">
                         <td><%= name %></td>
-                        <%
-                            if (name.equals("Image URL")) {
-                                %> <td><a href=<%= value %>>Link</a></td> <%
-                            } else {
-                                %> <td><%= value %></td> <%
-                            }
-                        %>
+                        <td><%= value %></td>
+                        <td><%= value %></td>
                         <td>-</td>
                         <td class="sources">Expand</td>
                     </tr>
@@ -119,13 +118,7 @@
 
                         <tr class="hidden sublevel2" data-srcno=<%= srcno %>>
                             <td><%= name %></td>
-                            <%
-                                if (name.equals("Image URL")) {
-                                    %> <td><a href=<%= value %>>Link</a></td> <%
-                                } else {
-                                    %> <td><%= value %></td> <%
-                                }
-                            %>
+                            <td><%= value %></td>
                             <td>-</td>
                             <td class="sources"><%= sourceText %></td>
                         </tr>
@@ -133,11 +126,39 @@
                         <%
                     }
                 }
-            %>
-
-            <%
 
             }
+            %>
+
+            </table>
+            <h2 class="subtitle">Images</h2>
+
+            <table id="images">
+            <%
+
+            for (int i = 0; i < Math.ceil(images.size() / 4.0); i++) {
+
+                %> <tr> <%
+
+                for (int j = 0; j < Math.min(4, images.size() - (i*4)); j++) {
+                    JSONObject image = images.get(i + j);
+
+                    %>
+
+                    <td><img src=<%= image.getString("value") %>></td>
+
+                    <%
+
+                }
+
+                    %></tr> <%
+            }
+
+            %>
+
+            </table>
+
+            <%
 
         } catch (JSONException e) {
             System.err.println("ERROR decoding the conclusion JSON.");
@@ -145,7 +166,6 @@
         }
 
         %>
-    </table>
 
     <%
 

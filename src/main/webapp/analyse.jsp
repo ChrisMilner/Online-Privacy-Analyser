@@ -42,9 +42,5 @@
 <body data-id=<%= id %> data-path=<%= path %>>
     <div id="spinner"></div>
     <h1 id="loading-text">Analysing your data</h1>
-
-    <div class="footer">
-        <a href="privacy.html">Privacy Policy</a>
-    </div>
 </body>
 </html>
