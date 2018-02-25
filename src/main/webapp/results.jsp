@@ -93,7 +93,6 @@
                     <tr class="hidden sublevel1" data-srcno="1">
                         <td><%= name %></td>
                         <td><%= value %></td>
-                        <td><%= value %></td>
                         <td>-</td>
                         <td class="sources">Expand</td>
                     </tr>
@@ -142,10 +141,11 @@
 
                 for (int j = 0; j < Math.min(4, images.size() - (i*4)); j++) {
                     JSONObject image = images.get(i + j);
+                    JSONArray sources = image.getJSONArray("sources");
 
                     %>
 
-                    <td><img src=<%= image.getString("value") %>></td>
+                    <td><img src=<%= image.getString("value") %> data-sources=<%= "'" + sources.toString() + "'" %>></td>
 
                     <%
 
@@ -183,6 +183,19 @@
         }
 
     %>
+
+    <div class="image-details hidden">
+        <div id="image-container">
+            <img src="">
+        </div>
+        <div id="close-btn"><p>Close</p></div>
+        <div id="image-sources">
+            <h3>Sources</h3>
+            <table id="image-source-table">
+                <tr><th>Name</th><th>Value</th></tr>
+            </table>
+        </div>
+    </div>
 
     <div class="footer">
         <a href="privacy.html">Privacy Policy</a>
