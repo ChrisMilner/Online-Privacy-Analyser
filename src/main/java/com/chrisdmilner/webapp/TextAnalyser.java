@@ -30,7 +30,17 @@ public class TextAnalyser {
 
         ArrayList<Fact> posts = f.getFactsWithName("Posted");
         for (Fact post : posts) {
-            conclusions.addAll(analysePost(post));
+            if (((MinedPost) post.getValue()).getContent() == null) continue;
+
+            //conclusions.addAll(analysePost(post));
+
+            ArrayList<String> keywords = KeywordTextAnalyser.analyse(((MinedPost) post.getValue()).getContent());
+
+            for (String kw : keywords) {
+                ArrayList<Fact> sources = new ArrayList<>();
+                sources.add(post);
+                conclusions.add(new Conclusion<>("Keyword Found", kw, 1, sources));
+            }
         }
 
         return conclusions;
@@ -39,7 +49,7 @@ public class TextAnalyser {
     private static ArrayList<Conclusion> analysePost(Fact post) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
-        String content = (String) post.getValue();
+        String content = ((MinedPost) post.getValue()).getContent();
 
         try {
             // Tokenise the content

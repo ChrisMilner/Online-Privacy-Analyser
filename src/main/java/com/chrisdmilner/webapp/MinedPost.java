@@ -12,13 +12,15 @@ public class MinedPost {
 	private Place place;
 	private String lang;
 	private String content;
+	private boolean byUser;
 
-	public MinedPost(Date time, GeoLocation loc, Place place, String lang, String content) {
+	public MinedPost(Date time, GeoLocation loc, Place place, String lang, String content, boolean byUser) {
 		this.createdTime = time;
 		this.location = loc;
 		this.place = place;
 		this.lang = lang;
 		this.content = content;
+		this.byUser = byUser;
 	}
 
 	public Date getCreatedTime() {
@@ -42,7 +44,7 @@ public class MinedPost {
 	}
 
 	public String toString() {
-		return createdTime.toString();
+		return "(" + createdTime.toString() + "): " + content;
 	}
 
 }

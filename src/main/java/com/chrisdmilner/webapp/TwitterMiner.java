@@ -106,8 +106,9 @@ public class TwitterMiner {
 	}
 
 	// Converts a tweet to a an internal class.
-	private static MinedPost mineTweet(Status tweet) {	
-		return new MinedPost(tweet.getCreatedAt(), tweet.getGeoLocation(), tweet.getPlace(), tweet.getLang(), tweet.getText()); 
+	private static MinedPost mineTweet(Status tweet) {
+		boolean byUser = !tweet.isRetweet();
+		return new MinedPost(tweet.getCreatedAt(), tweet.getGeoLocation(), tweet.getPlace(), tweet.getLang(), tweet.getText(), byUser);
 	}
 
 	// Converts a user to a an internal class.

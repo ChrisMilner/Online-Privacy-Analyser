@@ -16,7 +16,7 @@ public class KeywordTextAnalyser {
         for (String word : words) {
             for (String keyword : keywords) {
                 if (word.equals(keyword)) {
-                    System.out.println("Found Keyword: " + keyword);
+                    System.out.println("      Found Keyword: " + keyword);
                     keywordsFound.add(keyword);
                 }
             }

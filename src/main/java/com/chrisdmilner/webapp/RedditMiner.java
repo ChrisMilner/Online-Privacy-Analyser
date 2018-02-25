@@ -47,7 +47,7 @@ public class RedditMiner {
         MinedPost curr;
 
         for (PublicContribution<?> comment : comments) {
-            curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody());
+            curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody(), true);
             fb.addFact(new Fact<>("Commented", curr, rootFact));
             subreddits.add(comment.getSubreddit());
         }
@@ -57,7 +57,7 @@ public class RedditMiner {
 
         List<PublicContribution<?>> posts = postPaginator.accumulateMerged(-1);
         for (PublicContribution<?> post: posts) {
-            curr = new MinedPost(post.getCreated(), null, null, null, post.getBody());
+            curr = new MinedPost(post.getCreated(), null, null, null, post.getBody(), true);
             fb.addFact(new Fact<>("Posted", curr, rootFact));
             subreddits.add(post.getSubreddit());
         }

@@ -51,6 +51,9 @@ public class Analyser {
         System.out.println("   Analysing Images");
         conclusions.addAll(analyseImages(f));
 
+        System.out.println("   Analysing Posts");
+        conclusions.addAll(TextAnalyser.analyse(f));
+
         System.out.println("\n - ANALYSER FINISHED - \n");
 
         return conclusions;
