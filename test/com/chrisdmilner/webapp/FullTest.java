@@ -9,7 +9,8 @@ import org.junit.runners.Suite;
         TwitterMinerTest.class,
         RedditMinerTest.class,
         AnalyserTest.class,
-        MinerTest.class
+        MinerTest.class,
+        KeywordTextAnalyserTest.class
 })
 
 public class FullTest {}

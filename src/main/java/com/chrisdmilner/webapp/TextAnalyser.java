@@ -18,7 +18,7 @@ public class TextAnalyser {
     public static void main(String[] args) {
         FactBook f = new FactBook();
 
-//        f.addFact(new Fact<>("Posted", "I love watching rugby!! England is the best :))", "Twitter", "Tweets"));
+        f.addFact(new Fact<>("Posted", "I love watching rugby!! England isn't the best :))", null));
 
         ArrayList<Conclusion> conclusions = analyse(f);
 
