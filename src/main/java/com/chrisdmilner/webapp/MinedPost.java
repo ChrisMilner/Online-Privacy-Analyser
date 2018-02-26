@@ -43,8 +43,11 @@ public class MinedPost {
 		return content;
 	}
 
-	public String toString() {
-		return "(" + createdTime.toString() + "): " + content;
+	public boolean isByUser() {
+		return byUser;
 	}
 
+	public String toString() {
+		return content;
+	}
 }

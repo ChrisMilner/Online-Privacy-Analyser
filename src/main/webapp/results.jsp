@@ -55,6 +55,8 @@
             JSONArray conclusions = new JSONObject(json).getJSONArray("conclusions");
 
             ArrayList<JSONObject> images = new ArrayList<JSONObject>();
+            ArrayList<JSONObject> keywords = new ArrayList<JSONObject>();
+            ArrayList<JSONObject> sharedKeywords = new ArrayList<JSONObject>();
 
             JSONObject curr;
             String name;
@@ -67,6 +69,12 @@
 
                 if (name.equals("Image URL")) {
                     images.add(curr);
+                    continue;
+                } else if (name.equals("Keyword Posted")) {
+                    keywords.add(curr);
+                    continue;
+                } else if (name.equals("Keyword Shared")) {
+                    sharedKeywords.add(curr);
                     continue;
                 }
 
@@ -157,6 +165,67 @@
             %>
 
             </table>
+            <h2 class="subtitle">Posted Keywords</h2>
+            <%
+
+                if (keywords.isEmpty()){
+                    %>
+                    <p class="none">None</p>
+                    <%
+                }
+
+                for (int i = 0;i < keywords.size(); i++) {
+                    JSONObject kw = keywords.get(i);
+                    JSONObject primarySource = (JSONObject) kw.getJSONArray("sources").get(0);
+                    String keyword = (String) kw.get("value");
+                    String fullText = primarySource.getString("value");
+
+                    int start = fullText.indexOf(keyword);
+                    int end = start + keyword.length();
+
+                    String before = fullText.substring(0, start);
+                    String after = fullText.substring(end);
+
+                    %>
+                    <div class="keyword-section">
+                        <div class="keyword"><%= keyword %></div>
+                        <div class="full-text"><%= before %><mark><%= keyword %></mark><%= after %></div>
+                    </div>
+                    <%
+                }
+
+            %>
+
+            <h2 class="subtitle">Shared Keywords</h2>
+            <%
+
+                if (sharedKeywords.isEmpty()){
+                    %>
+                    <p class="none">None</p>
+                    <%
+                }
+
+                for (int i = 0;i < sharedKeywords.size(); i++) {
+                    JSONObject kw = sharedKeywords.get(i);
+                    JSONObject primarySource = (JSONObject) kw.getJSONArray("sources").get(0);
+                    String keyword = (String) kw.get("value");
+                    String fullText = primarySource.getString("value");
+
+                    int start = fullText.indexOf(keyword);
+                    int end = start + keyword.length();
+
+                    String before = fullText.substring(0, start);
+                    String after = fullText.substring(end);
+
+                    %>
+                    <div class="keyword-section">
+                        <div class="keyword"><%= keyword %></div>
+                        <div class="full-text"><%= before %><mark><%= keyword %></mark><%= after %></div>
+                    </div>
+                    <%
+                }
+
+            %>
 
             <%
 

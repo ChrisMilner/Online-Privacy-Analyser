@@ -232,6 +232,7 @@ input[type="submit"]:hover {
 }
 
 .footer {
+    margin-top: 5vh;
 	margin-bottom: 2vh;
 }
 
@@ -475,4 +476,35 @@ div#error p {
 #image-source-table th,
 #image-source-table td {
     padding: 5px;
+}
+
+.none {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 2vh 0 5vh 0;
+
+    color: rgba(255,255,255,0.8)
+}
+
+.keyword-section {
+    background-color: white;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+
+    width: 80%;
+
+    font-size: 22px;
+
+    margin: 4vh auto 4vh auto;
+}
+
+.keyword {
+    font-weight: bold;
+
+    border-bottom: solid 1px rgba(0,0,0,0.5);
+
+    padding: 2vh;
+}
+
+.full-text {
+    padding: 2vh;
 }

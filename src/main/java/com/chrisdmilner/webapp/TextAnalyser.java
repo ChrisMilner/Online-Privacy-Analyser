@@ -30,16 +30,17 @@ public class TextAnalyser {
 
         ArrayList<Fact> posts = f.getFactsWithName("Posted");
         for (Fact post : posts) {
-            if (((MinedPost) post.getValue()).getContent() == null) continue;
+            MinedPost mp = (MinedPost) post.getValue();
+            if (mp.getContent() == null) continue;
 
-            //conclusions.addAll(analysePost(post));
-
-            ArrayList<String> keywords = KeywordTextAnalyser.analyse(((MinedPost) post.getValue()).getContent());
+            ArrayList<String> keywords = KeywordTextAnalyser.analyse(mp.getContent());
+            String conclusionName = "Keyword Shared";
+            if (mp.isByUser()) conclusionName = "Keyword Posted";
 
             for (String kw : keywords) {
                 ArrayList<Fact> sources = new ArrayList<>();
                 sources.add(post);
-                conclusions.add(new Conclusion<>("Keyword Found", kw, 1, sources));
+                conclusions.add(new Conclusion<>(conclusionName, kw, 1, sources));
             }
         }
 
