@@ -358,6 +358,8 @@ input[type="submit"]:hover {
     max-width: 100%;
 
     cursor: pointer;
+
+    box-shadow: 0 0 10px 0 black;
 }
 
 div#error {
@@ -495,6 +497,7 @@ div#error p {
     font-size: 22px;
 
     margin: 4vh auto 4vh auto;
+    padding: 10px;
 }
 
 .keyword {
@@ -507,4 +510,13 @@ div#error p {
 
 .full-text {
     padding: 2vh;
+}
+
+.source-text {
+    text-align: left;
+    color: rgba(0,0,0,0.6);
+
+    font-size: 14px;
+
+    margin: 5px;
 }

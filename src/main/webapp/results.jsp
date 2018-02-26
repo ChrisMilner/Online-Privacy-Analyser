@@ -186,10 +186,18 @@
                     String before = fullText.substring(0, start);
                     String after = fullText.substring(end);
 
+                    String rootSource = primarySource.getJSONObject("source").getString("name");
+                    String source = "Facebook Posts";
+                    if (rootSource.equals("Twitter Account"))
+                        source = "Twitter Feed";
+                    else if (rootSource.equals("Reddit Account"))
+                        source = "Reddit Posts/Comments";
+
                     %>
                     <div class="keyword-section">
                         <div class="keyword"><%= keyword %></div>
                         <div class="full-text"><%= before %><mark><%= keyword %></mark><%= after %></div>
+                        <p class="source-text">from your <%= source %></p>
                     </div>
                     <%
                 }
@@ -217,10 +225,18 @@
                     String before = fullText.substring(0, start);
                     String after = fullText.substring(end);
 
+                    String rootSource = primarySource.getJSONObject("source").getString("name");
+                    String source = "Facebook Posts";
+                    if (rootSource.equals("Twitter Account"))
+                        source = "Twitter Feed";
+                    else if (rootSource.equals("Reddit Account"))
+                        source = "Reddit Posts/Comments";
+
                     %>
                     <div class="keyword-section">
                         <div class="keyword"><%= keyword %></div>
                         <div class="full-text"><%= before %><mark><%= keyword %></mark><%= after %></div>
+                        <p class="source-text">from your <%= source %></p>
                     </div>
                     <%
                 }
