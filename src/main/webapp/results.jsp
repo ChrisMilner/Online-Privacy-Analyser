@@ -150,7 +150,7 @@
                 %> <tr> <%
 
                 for (int j = 0; j < Math.min(4, images.size() - (i*4)); j++) {
-                    JSONObject image = images.get(i + j);
+                    JSONObject image = images.get((i*4) + j);
                     JSONArray sources = image.getJSONArray("sources");
 
                     %>
