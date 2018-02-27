@@ -11,7 +11,6 @@ public class Analyser {
 
     // TODO:
     //  - Education
-    //  - Text Posts
     //  - Locations
     //  - Email(s)
     //  - Interests
@@ -20,7 +19,7 @@ public class Analyser {
     //  - Sexuality
     //  - Partner
     //  - Jobs
-    //  - Lanuages
+    //  - Languages
     //  - Friends
     //  - Birth Month and Day
 

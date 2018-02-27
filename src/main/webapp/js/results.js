@@ -62,6 +62,7 @@ function openSources(row) {
     var srcno = row.getAttribute("data-srcno");
 
     row = row.nextElementSibling;
+    row.classList.add("top");
     for (var i = 0; i < srcno; i++) {
         row.classList.remove("hidden");
 

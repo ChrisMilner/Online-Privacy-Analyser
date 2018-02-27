@@ -98,7 +98,7 @@
                     value = src.getString("value");
                     %>
 
-                    <tr class="hidden sublevel1" data-srcno="1">
+                    <tr class="hidden" style ="background-color:rgba(0,0,0,0.05)" data-srcno="1">
                         <td><%= name %></td>
                         <td><%= value %></td>
                         <td>-</td>
@@ -108,7 +108,9 @@
                     <%
 
                     JSONObject subsrc = src;
+                    int depth = 1;
                     while (subsrc.getJSONObject("source").has("source")) {
+                        depth++;
                         subsrc = subsrc.getJSONObject("source");
 
                         int srcno = 1;
@@ -123,7 +125,7 @@
 
                         %>
 
-                        <tr class="hidden sublevel2" data-srcno=<%= srcno %>>
+                        <tr class="hidden" style ="background-color:rgba(0,0,0,<%= depth * 0.05 %>)" data-srcno=<%= srcno %>>
                             <td><%= name %></td>
                             <td><%= value %></td>
                             <td>-</td>

@@ -47,7 +47,7 @@ public class TextAnalyser {
         return conclusions;
     }
 
-    private static ArrayList<Conclusion> analysePost(Fact post) {
+    protected static ArrayList<Conclusion> analysePost(Fact post) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
         String content = ((MinedPost) post.getValue()).getContent();
@@ -73,7 +73,7 @@ public class TextAnalyser {
             String[] chunks = chunker.chunk(tokens,tags);
 
             for (int i = 0; i < tokens.length; i++) {
-                System.out.println(tokens[i] + " - " + tags[i] + " - " + chunks[i]);
+                System.out.println(tokens[i] + "\t" + tags[i] + "\t" + chunks[i]);
             }
 
         } catch (UnsupportedEncodingException e) {

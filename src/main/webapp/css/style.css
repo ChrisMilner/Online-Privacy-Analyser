@@ -64,43 +64,63 @@ body {
 #title {
 	font-size: 6vw;
 	font-weight: bold;
-	color: rgba(255,255,255,0.8);
+	color: rgba(255,255,255,1);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 
-	margin: 6vh;
+	margin: 4vh;
+    line-height: 1.2em;
 }
 
 .subtitle {
-    font-size: 4vw;
+    font-size: 5vw;
     font-weight: bold;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,1);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 
     margin: 2vh;
+    line-height: 1.2em;
 }
 
 #description {
 	font-size: calc(1em + 0.4vw);
-	color: rgba(0,0,0,0.6);
+	color: black;
 
-	margin: 4vh 15vw 6vh 15vw;
+	margin: 3vh auto 3vh auto;
+    padding: 1.2em 0 1.5em 0;
 
+    width: 90%;
 	line-height: 1.8em;
+
+    background-color: white;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
 }
 
-#instructions {
-	font-size: calc(1em + 0.4vw);
-	color: rgba(0,0,0,0.6);
-
-	margin-bottom: 4vh;
-
-	line-height: 1.8em;
+#description p {
+    margin: auto 2vw auto 2vw;
 }
 
 #start-points {
-	width: 60%;
+	width: 90%;
 	margin: auto;
-	padding: 30px;
 
 	border: solid 1px rgba(255,255,255,0.6);
+    background-color: white;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+}
+
+#start-points form {
+    width: 75%;
+    margin: 4vh auto 4vh auto;
+    padding: 20px;
+}
+
+#instructions {
+    font-size: calc(1em + 0.4vw);
+    color: black;
+
+    margin-bottom: 4vh;
+
+    line-height: 1.8em;
 }
 
 .label {
@@ -108,7 +128,7 @@ body {
 	font-weight: bold;
 	margin-bottom: 5px;
 
-	color: rgba(0,0,0,0.8);
+	color: black;
 }
 
 input[type="text"] {
@@ -117,20 +137,22 @@ input[type="text"] {
 	font-size: 1.2vw;
 	width: 70%;
 	margin-bottom: 30px;
-	color: rgba(0,0,0,0.6);
+	color: rgba(0,0,0,0.8);
 	text-align: center;
-	background-color: transparent;
-	border: solid 1px white;
+
+	background-color: white;
+	border: solid 1px rgba(0,0,0,0.4);
+    box-shadow: inset 0 0 5px 0 rgba(0,0,0,0.2);
 }
 
 input[type="text"]:focus {
-	background-color: rgba(255,255,255,0.1);
+	background-color: rgba(0,0,0,0.05);
 	outline: none;
 }
 
 #fb-login-div {
     width: 70%;
-    border: solid 1px white;
+    border: solid 1px black;
     margin: auto;
     margin-top: 1vh;
     margin-bottom: 1vh;
@@ -192,17 +214,21 @@ input[type="text"]:focus {
     text-align: center;
 
     background-color: transparent;
-    border: solid 2px white;
-    color: white;
+    border: solid 2px rgb(100,180,250);
+    color: black;
+
+    border-radius: 3px;
 
     font-size: 2vh;
+
+    cursor: pointer;
 
     transition: background-color 0.5s, color 0.5s;
 }
 
 #fb-login:hover {
-    background-color: white;
-    color: black;
+    background-color: rgb(100,180,250);
+    color: white;
 }
 
 input[type="submit"] {
@@ -214,15 +240,17 @@ input[type="submit"] {
 	cursor: pointer;
 
 	background-color: transparent;
-	border: solid 2px white;
-	color: white;
+	border: solid 2px rgb(100,180,250);
+	color: black;
+
+    border-radius: 3px;
 
 	transition: background-color 0.5s, color 0.5s;
 }
 
 input[type="submit"]:hover {
-	background-color: white;
-	color: black;
+	background-color: rgb(100,180,250);
+	color: white;
 }
 
 #exception {
@@ -303,23 +331,21 @@ input[type="submit"]:hover {
 	margin: auto;
 	margin-bottom: 10vh;
 	font-size: 2vw;
+
+    background-color: white;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
 }
 
 #conclusions tr {
 	height: 10vh;
-    background-color: rgba(256, 256, 256, 0.2);
 }
 
 #conclusions tr.hidden {
 	display: none;
 }
 
-#conclusions tr.sublevel1 {
-    background-color: rgba(256, 256, 256, 0.4);
-}
-
-#conclusions tr.sublevel2 {
-    background-color: rgba(256, 256, 256, 0.6);
+#conclusions tr.top {
+    box-shadow: inset 0 2px 5px 0 rgba(0,0,0,0.1);
 }
 
 #conclusions td,
@@ -330,16 +356,24 @@ input[type="submit"]:hover {
 
 #conclusions th {
     font-weight: bold;
-    border-bottom: solid 4px rgb(100, 180, 250);
+    border-bottom: solid 2px rgb(100, 180, 250);
 }
 
 .sources {
     color: black;
 }
 
+#conclusions td.sources {
+    -webkit-transition: background-color 0.2s, color 0.2s;
+    -moz-transition: background-color 0.2s, color 0.2s;
+    -o-transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
+}
+
 #conclusions td.sources:hover {
     cursor: pointer;
-    background-color: rgba(256, 256, 256, 0.6);
+    background-color: rgba(100, 180, 250, 1);
+    color: white;
 }
 
 #images {
@@ -481,11 +515,11 @@ div#error p {
 }
 
 .none {
-    font-size: 20px;
+    font-size: 3vh;
     font-weight: bold;
     margin: 2vh 0 5vh 0;
 
-    color: rgba(255,255,255,0.8)
+    color: rgba(255,255,255,1)
 }
 
 .keyword-section {
@@ -510,6 +544,7 @@ div#error p {
 
 .full-text {
     padding: 2vh;
+    line-height: 1.5em;
 }
 
 .source-text {
