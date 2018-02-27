@@ -92,8 +92,10 @@ public class FacebookMiner {
             min.add(Calendar.YEAR, - (u.getAgeRange().getMax() + 1));
 
             // Parse the dates into facts.
-            fs.addFact(new Fact<>("Max Birth Date", max.getTime(), rootFact));
-		    fs.addFact(new Fact<>("Min Birth Date", min.getTime(), rootFact));
+			Fact minAgeFact = new Fact<>("Min Age", u.getAgeRange().getMin(), rootFact);
+            Fact maxAgeFact = new Fact<>("Max Age", u.getAgeRange().getMax(), rootFact);
+            fs.addFact(new Fact<>("Max Birth Date", max.getTime(), minAgeFact));
+		    fs.addFact(new Fact<>("Min Birth Date", min.getTime(), maxAgeFact));
 		}
 
 		if (u.getBio() != null) 				fs.addFact(new Fact<>("Description", u.getBio(), rootFact));

@@ -531,7 +531,7 @@ div#error p {
     font-size: 22px;
 
     margin: 4vh auto 4vh auto;
-    padding: 10px;
+    padding: 0 10px 10px 10px;
 }
 
 .keyword {
