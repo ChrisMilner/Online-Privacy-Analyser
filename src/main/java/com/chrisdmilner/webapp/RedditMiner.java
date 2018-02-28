@@ -5,10 +5,12 @@ import net.dean.jraw.http.OkHttpNetworkAdapter;
 import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.models.Account;
 import net.dean.jraw.models.PublicContribution;
+import net.dean.jraw.models.Submission;
 import net.dean.jraw.oauth.Credentials;
 import net.dean.jraw.oauth.OAuthHelper;
 import net.dean.jraw.pagination.DefaultPaginator;
 import net.dean.jraw.references.OtherUserReference;
+import net.dean.jraw.references.SubmissionReference;
 
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +49,8 @@ public class RedditMiner {
         MinedPost curr;
 
         for (PublicContribution<?> comment : comments) {
-            curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody(), true);
+        	System.out.println("Comment: " + comment.getBody());
+            curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody(), new String[0], true);
             fb.addFact(new Fact<>("Commented", curr, rootFact));
             subreddits.add(comment.getSubreddit());
         }
@@ -56,8 +59,11 @@ public class RedditMiner {
 		DefaultPaginator<PublicContribution<?>> postPaginator = user.history("submitted").build();
 
         List<PublicContribution<?>> posts = postPaginator.accumulateMerged(-1);
-        for (PublicContribution<?> post: posts) {
-            curr = new MinedPost(post.getCreated(), null, null, null, post.getBody(), true);
+        for (PublicContribution<?> post : posts) {
+            Submission postData = ((SubmissionReference) post.toReference(reddit)).inspect();
+            String content = postData.getTitle() + "\n" + postData.getSelfText();
+            String[] media = {postData.getUrl()};
+        	curr = new MinedPost(post.getCreated(), null, null, null, content, media, true);
             fb.addFact(new Fact<>("Posted", curr, rootFact));
             subreddits.add(post.getSubreddit());
         }

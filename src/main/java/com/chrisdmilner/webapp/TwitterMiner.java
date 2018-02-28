@@ -108,7 +108,13 @@ public class TwitterMiner {
 	// Converts a tweet to a an internal class.
 	private static MinedPost mineTweet(Status tweet) {
 		boolean byUser = !tweet.isRetweet();
-		return new MinedPost(tweet.getCreatedAt(), tweet.getGeoLocation(), tweet.getPlace(), tweet.getLang(), tweet.getText(), byUser);
+
+		MediaEntity[] media = tweet.getMediaEntities();
+		String[] urls = new String[media.length];
+		for (int i = 0; i < media.length; i++)
+		    urls[i] = media[i].getMediaURL();
+
+		return new MinedPost(tweet.getCreatedAt(), tweet.getGeoLocation(), tweet.getPlace(), tweet.getLang(), tweet.getText(), urls, byUser);
 	}
 
 	// Converts a user to a an internal class.

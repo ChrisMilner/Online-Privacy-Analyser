@@ -12,14 +12,16 @@ public class MinedPost {
 	private Place place;
 	private String lang;
 	private String content;
+	private String[] mediaURLs;
 	private boolean byUser;
 
-	public MinedPost(Date time, GeoLocation loc, Place place, String lang, String content, boolean byUser) {
+	public MinedPost(Date time, GeoLocation loc, Place place, String lang, String content, String[] mediaURLs, boolean byUser) {
 		this.createdTime = time;
 		this.location = loc;
 		this.place = place;
 		this.lang = lang;
 		this.content = content;
+		this.mediaURLs = mediaURLs;
 		this.byUser = byUser;
 	}
 
@@ -47,7 +49,11 @@ public class MinedPost {
 		return byUser;
 	}
 
+    public String[] getMediaURLs() {
+        return mediaURLs;
+    }
+
 	public String toString() {
-		return content;
+		return createdTime + " : " + location + " : " + place + " : " + content;
 	}
 }

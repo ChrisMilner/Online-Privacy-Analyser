@@ -11,7 +11,7 @@ public class Analyser {
 
     // TODO:
     //  - Education
-    //  - Locations
+    //  - Locations (Map?)
     //  - Email(s)
     //  - Interests
     //  - Politics
@@ -22,6 +22,7 @@ public class Analyser {
     //  - Languages
     //  - Friends
     //  - Birth Month and Day
+    //  - Online Activity (Graph)
 
     private final static int CURRENT_YEAR = 2018;
 
