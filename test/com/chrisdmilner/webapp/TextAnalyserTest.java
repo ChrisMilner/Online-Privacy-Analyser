@@ -3,6 +3,7 @@ package com.chrisdmilner.webapp;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.*;
 
@@ -10,25 +11,24 @@ public class TextAnalyserTest {
 
     @Test
     public void analysePost() {
-        Fact fbRoot = new Fact<>("Facebook Account", "19374837249", null);
+        String[][] spo = TextAnalyser.analysePost("A car is a vehicle");
+        assertEquals("A car", spo[0][0]);
+        assertEquals("is", spo[0][1]);
+        assertEquals("a vehicle", spo[0][2]);
 
-        MinedPost mp = new MinedPost(null, null, null, null, "I watch football.", true);
-        ArrayList<Conclusion> results = TextAnalyser.analysePost(new Fact<>("Tweet", mp, fbRoot));
+        spo = TextAnalyser.analysePost("Just went to France in one");
+        assertEquals("I", spo[0][0]);
+        assertEquals("went", spo[0][1]);
+        assertEquals("France", spo[0][2]);
 
-        assertEquals(1, results.size());
-        assertEquals("watch football", results.get(0).getValue());
+        spo = TextAnalyser.analysePost("A bike is also a vehicle");
+        assertEquals("A bike", spo[0][0]);
+        assertEquals("is", spo[0][1]);
+        assertEquals("a vehicle", spo[0][2]);
 
-        mp = new MinedPost(null, null, null, null, "I love watching football. Also I live in England.", true);
-        results = TextAnalyser.analysePost(new Fact<>("Tweet", mp, fbRoot));
-
-        assertEquals(2, results.size());
-        assertEquals("Love: Watching Football", results.get(0).getValue());
-        assertEquals("Live: England", results.get(1).getValue());
-
-        mp = new MinedPost(null, null, null, null, "Jeremy Corbyn is my favourite politician.", true);
-        results = TextAnalyser.analysePost(new Fact<>("Tweet", mp, fbRoot));
-
-        assertEquals(1, results.size());
-        assertEquals("Favourite Politician: Jeremy Corbyn", results.get(0).getValue());
+        spo = TextAnalyser.analysePost("Krispy Kreme doughnuts are very tasty");
+        assertEquals("Krispy Kreme doughnuts", spo[0][0]);
+        assertEquals("are", spo[0][1]);
+        assertEquals("very tasty", spo[0][2]);
     }
 }
