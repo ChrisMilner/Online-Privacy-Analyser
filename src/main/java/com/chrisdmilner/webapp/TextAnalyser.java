@@ -1,31 +1,19 @@
 package com.chrisdmilner.webapp;
 
-import opennlp.tools.chunker.ChunkerME;
-import opennlp.tools.chunker.ChunkerModel;
 import opennlp.tools.cmdline.parser.ParserTool;
+import opennlp.tools.lemmatizer.DictionaryLemmatizer;
 import opennlp.tools.parser.Parse;
 import opennlp.tools.parser.Parser;
 import opennlp.tools.parser.ParserFactory;
 import opennlp.tools.parser.ParserModel;
-import opennlp.tools.postag.POSModel;
-import opennlp.tools.postag.POSTaggerME;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class TextAnalyser {
-    public static void main(String[] args) {
-        FactBook f = new FactBook();
-
-        f.addFact(new Fact<>("Posted", "I love watching rugby!! England isn't the best :))", null));
-
-        ArrayList<Conclusion> conclusions = analyse(f);
-
-        System.out.println(conclusions.toString());
-    }
 
     public static ArrayList<Conclusion> analyse(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
@@ -75,6 +63,24 @@ public class TextAnalyser {
         }
 
         return clauseTriplets;
+    }
+
+    protected static String lemmatizeVerb(String verb, String tag) {
+        try {
+            InputStream dictLemmatizer = new FileInputStream(Util.getResourceURI() + "models/en-lemmatizer.dict");
+            DictionaryLemmatizer lemmatizer = new DictionaryLemmatizer(dictLemmatizer);
+
+            String[] lemmas = lemmatizer.lemmatize(new String[] {verb}, new String[] {tag});
+            return lemmas[0];
+        } catch (FileNotFoundException fe) {
+            System.err.println("ERROR Lemmatizer File Not Found");
+            fe.printStackTrace();
+        } catch (IOException ioe) {
+            System.err.println("ERROR Reading the Lemmatizer file");
+            ioe.printStackTrace();
+        }
+
+        return null;
     }
 
     private static String[] getSPOTriplets(String clause) {

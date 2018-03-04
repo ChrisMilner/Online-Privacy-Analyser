@@ -31,4 +31,28 @@ public class TextAnalyserTest {
         assertEquals("are", spo[0][1]);
         assertEquals("very tasty", spo[0][2]);
     }
+
+    @Test
+    public void lemmatizeVerb() {
+        String lemma = TextAnalyser.lemmatizeVerb("lived", "VBN");
+        assertEquals("live", lemma);
+
+        lemma = TextAnalyser.lemmatizeVerb("buying", "VBG");
+        assertEquals("buy", lemma);
+
+        lemma = TextAnalyser.lemmatizeVerb("go", "VB");
+        assertEquals("go", lemma);
+
+        lemma = TextAnalyser.lemmatizeVerb("place", "VB");
+        assertEquals("place", lemma);
+
+        lemma = TextAnalyser.lemmatizeVerb("are", "VBP");
+        assertEquals("be", lemma);
+
+        lemma = TextAnalyser.lemmatizeVerb("is", "VBZ");
+        assertEquals("be", lemma);
+
+        lemma = TextAnalyser.lemmatizeVerb("bought", "VBN");
+        assertEquals("buy", lemma);
+    }
 }
