@@ -45,7 +45,7 @@ public class Conclusion<T> {
 		String out = name + " : " + value + " (" + confidence + ")\n";
 
         for (Fact f : sources)
-            out += "   " + f.toString() + "\n";
+            out += "   " + f + "\n";
 
 		return out;
 	}

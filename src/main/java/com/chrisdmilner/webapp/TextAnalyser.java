@@ -37,7 +37,7 @@ public class TextAnalyser {
         return conclusions;
     }
 
-    protected static String[][] analysePost(String post) {
+    protected static ArrayList<Conclusion> analysePost(String post, Fact source) {
         String[] clauses = post.split("\\. |\n|\t");
 
         int count = 0;
@@ -56,13 +56,54 @@ public class TextAnalyser {
             System.out.println("Clause: " + clauses[i]);
         }
 
-        String[][] clauseTriplets = new String[processedClauses.length][3];
+        ArrayList<Conclusion> conclusions = new ArrayList<>();
 
         for (int i = 0; i < processedClauses.length; i++) {
-            clauseTriplets[i] = getSPOTriplets(processedClauses[i]);
+            Conclusion result = analyseClause(processedClauses[i], source);
+            if (result != null) conclusions.add(result);
         }
 
-        return clauseTriplets;
+        return conclusions;
+    }
+
+    private static Conclusion analyseClause(String clause, Fact source) {
+        String[] spo = getSPOTriplets(clause);
+
+        String sbj = spo[0].toLowerCase();
+        if (!sbj.equals("i") && !sbj.equals("we")) {
+            if (spo[1].equals("be")) {
+
+            } else return null;
+        }
+
+        ArrayList<Fact> sources = new ArrayList<>();
+        sources.add(source);
+        return new Conclusion<>("Statement", spo[1] + ":" + spo[2], 1, sources);
+    }
+
+    private static String[] getSPOTriplets(String clause) {
+        Parse tree = getParseTree(clause);
+        tree = tree.getChildren()[0];
+
+        Parse subjectNode = getSubject(tree);
+        String subject;
+        if (subjectNode == null) subject = "I";
+        else subject = subjectNode.getCoveredText();
+
+        Parse predicateNode = getPredicate(tree);
+        String predicate;
+        if (predicateNode == null) predicate = null;
+        else predicate = lemmatizeVerb(predicateNode.getCoveredText(), predicateNode.getType());
+
+        Parse objectNode = getObject(tree, predicateNode);
+        String object;
+        if (objectNode == null) object = null;
+        else object = objectNode.getCoveredText();
+
+        System.out.println("Subject | Predicate | Object");
+        System.out.println(subject + " | " + predicate + " | " + object + "\n\n");
+
+        return new String[] {subject, predicate, object};
     }
 
     protected static String lemmatizeVerb(String verb, String tag) {
@@ -81,31 +122,6 @@ public class TextAnalyser {
         }
 
         return null;
-    }
-
-    private static String[] getSPOTriplets(String clause) {
-        Parse tree = getParseTree(clause);
-        tree = tree.getChildren()[0];
-
-        Parse subjectNode = getSubject(tree);
-        String subject;
-        if (subjectNode == null) subject = "I";
-        else subject = subjectNode.getCoveredText();
-
-        Parse predicateNode = getPredicate(tree);
-        String predicate;
-        if (predicateNode == null) predicate = null;
-        else predicate = predicateNode.getCoveredText();
-
-        Parse objectNode = getObject(tree, predicateNode);
-        String object;
-        if (objectNode == null) object = null;
-        else object = objectNode.getCoveredText();
-
-        System.out.println("Subject  Predicate  Object");
-        System.out.println(subject + "  " + predicate + "  " + object);
-
-        return new String[] {subject, predicate, object};
     }
 
     private static Parse getParseTree(String clause) {

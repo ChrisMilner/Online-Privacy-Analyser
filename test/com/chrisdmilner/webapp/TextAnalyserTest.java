@@ -3,7 +3,6 @@ package com.chrisdmilner.webapp;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.*;
 
@@ -11,25 +10,20 @@ public class TextAnalyserTest {
 
     @Test
     public void analysePost() {
-        String[][] spo = TextAnalyser.analysePost("A car is a vehicle");
-        assertEquals("A car", spo[0][0]);
-        assertEquals("is", spo[0][1]);
-        assertEquals("a vehicle", spo[0][2]);
+        ArrayList<Conclusion> concs = TextAnalyser.analysePost("A car is a vehicle", null);
+        System.out.println(concs.toString() + "\n");
 
-        spo = TextAnalyser.analysePost("Just went to France in one");
-        assertEquals("I", spo[0][0]);
-        assertEquals("went", spo[0][1]);
-        assertEquals("France", spo[0][2]);
+        concs = TextAnalyser.analysePost("Just went to France in one", null);
+        System.out.println(concs.toString() + "\n");
 
-        spo = TextAnalyser.analysePost("A bike is also a vehicle");
-        assertEquals("A bike", spo[0][0]);
-        assertEquals("is", spo[0][1]);
-        assertEquals("a vehicle", spo[0][2]);
+        concs = TextAnalyser.analysePost("A bike is also a vehicle", null);
+        System.out.println(concs.toString() + "\n");
 
-        spo = TextAnalyser.analysePost("Krispy Kreme doughnuts are very tasty");
-        assertEquals("Krispy Kreme doughnuts", spo[0][0]);
-        assertEquals("are", spo[0][1]);
-        assertEquals("very tasty", spo[0][2]);
+        concs = TextAnalyser.analysePost("Krispy Kreme doughnuts are very tasty", null);
+        System.out.println(concs.toString() + "\n");
+
+        concs = TextAnalyser.analysePost("Just two weeks then I am off to North Korea", null);
+        System.out.println(concs.toString() + "\n");
     }
 
     @Test
