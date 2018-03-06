@@ -32,6 +32,8 @@ public class TextAnalyser {
                 sources.add(post);
                 conclusions.add(new Conclusion<>(conclusionName, kw, 1, sources));
             }
+
+            if (mp.isByUser()) conclusions.addAll(analysePost(mp.getContent(), post));
         }
 
         return conclusions;
@@ -52,8 +54,6 @@ public class TextAnalyser {
         for (int i = 0; i < clauses.length; i++) {
             if (clauses[i] != null)
                 processedClauses[index++] = clauses[i];
-
-            System.out.println("Clause: " + clauses[i]);
         }
 
         ArrayList<Conclusion> conclusions = new ArrayList<>();
@@ -67,43 +67,55 @@ public class TextAnalyser {
     }
 
     private static Conclusion analyseClause(String clause, Fact source) {
+        ArrayList<Fact> sources = new ArrayList<>();
+        sources.add(source);
+
         String[] spo = getSPOTriplets(clause);
+
+        if (spo[0] == null || spo[1] == null || spo[2] == null)
+            return null;
 
         String sbj = spo[0].toLowerCase();
         if (!sbj.equals("i") && !sbj.equals("we")) {
-            if (spo[1].equals("be")) {
-
+            if (spo[3].equals("be")) {
+                String rebuiltClause = spo[0] + " " + spo[1] + " " + spo[2];
+                return new Conclusion<>("Statement", "Belief:" + rebuiltClause, 1, sources);
             } else return null;
         }
 
-        ArrayList<Fact> sources = new ArrayList<>();
-        sources.add(source);
-        return new Conclusion<>("Statement", spo[1] + ":" + spo[2], 1, sources);
+        return new Conclusion<>("Statement", spo[3] + ":" + spo[2], 1, sources);
     }
 
     private static String[] getSPOTriplets(String clause) {
         Parse tree = getParseTree(clause);
         tree = tree.getChildren()[0];
 
-        Parse subjectNode = getSubject(tree);
-        String subject;
-        if (subjectNode == null) subject = "I";
-        else subject = subjectNode.getCoveredText();
-
         Parse predicateNode = getPredicate(tree);
         String predicate;
         if (predicateNode == null) predicate = null;
-        else predicate = lemmatizeVerb(predicateNode.getCoveredText(), predicateNode.getType());
+        else predicate = predicateNode.getCoveredText();
 
-        Parse objectNode = getObject(tree, predicateNode);
+        String lemmatized = null;
+        if (predicateNode != null)
+            lemmatized = lemmatizeVerb(predicate, predicateNode.getType());
+
+        Parse objectNode = null;
+        if (predicateNode != null) objectNode = getObject(predicateNode);
         String object;
         if (objectNode == null) object = null;
         else object = objectNode.getCoveredText();
 
+
+        Parse subjectNode = null;
+        if (predicateNode != null) subjectNode = getSubject(predicateNode);
+        String subject;
+        if (subjectNode == null) subject = "I";
+        else subject = subjectNode.getCoveredText();
+
         System.out.println("Subject | Predicate | Object");
         System.out.println(subject + " | " + predicate + " | " + object + "\n\n");
 
-        return new String[] {subject, predicate, object};
+        return new String[] {subject, predicate, object, lemmatized};
     }
 
     protected static String lemmatizeVerb(String verb, String tag) {
@@ -153,12 +165,43 @@ public class TextAnalyser {
         return null;
     }
 
-    private static Parse getSubject(Parse tree) {
-        Parse np = breadthFirstParseSearch(tree.getChildren(), "NP", 1, false);
+    private static Parse getSubject(Parse verb) {
+        Parse tree = verb.getParent();
+        while (!tree.getType().equals("VP")) {
+            tree = tree.getParent();
+        }
+        tree = tree.getParent();
 
-        if (np == null) return null;
+        Parse[] children = tree.getChildren();
 
-        Parse subjectNode = breadthFirstParseSearch(np.getChildren(), "NN(.*)", -1, false);
+        boolean pastVerb = false;
+        Parse[] possibleSubjects = null;
+        int j = 0;
+        for (int i = children.length - 1; i >= 0; i--) {
+            if (!pastVerb && children[i].getType().equals("VP")) {
+                pastVerb = true;
+                if (i == 0) return null;
+                possibleSubjects = new Parse[i];
+                continue;
+            }
+
+            if (pastVerb) {
+                possibleSubjects[j++] = children[i];
+            }
+        }
+
+        Parse np = null;
+        for (Parse p : possibleSubjects) {
+            System.out.println(p.getType() + " type");
+            if (p.getType().matches("NP")) {
+                np = p;
+                break;
+            }
+        }
+
+//        Parse np = breadthFirstParseSearch(tree.getChildren(), "NP", 1, false);
+//        if (np == null) return null;
+//        Parse subjectNode = breadthFirstParseSearch(np.getChildren(), "NN(.*)", -1, false);
 
         return np;
     }
@@ -166,12 +209,14 @@ public class TextAnalyser {
     private static Parse getPredicate(Parse tree) {
         Parse vp = breadthFirstParseSearch(tree.getChildren(), "VP", 1, false);
 
+        if (vp == null) return null;
+
         Parse predicateNode = breadthFirstParseSearch(vp.getChildren(), "VB(.*)", -1, true);
 
         return predicateNode;
     }
 
-    private static Parse getObject(Parse tree, Parse predicateNode) {
+    private static Parse getObject(Parse predicateNode) {
         Parse[] predicateSiblings = predicateNode.getParent().getChildren();
 
         Parse match = null;
