@@ -3,6 +3,7 @@ package com.chrisdmilner.webapp;
 import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
 
+import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class FacebookMiner {
 		Facebook fb = ff.getInstance();
 
 		User u = null;
+        URL picURL;
 		try {
             fb.extendTokenExpiration();
 
@@ -38,9 +40,12 @@ public class FacebookMiner {
                                                     "religion",     "significant_other","sports",
                                                     "website",      "work");
 
+            System.out.println("   Processing the user's profile data");
+
             if (at.equals("")) {
                 u = fb.getUser(id, reading);
 
+                picURL = fb.getPictureURL(id, PictureSize.large);
             } else {
                 u = fb.getMe(reading);
 
@@ -54,19 +59,19 @@ public class FacebookMiner {
                      fs.addFact(new Fact<>("Image URL", url, rootFact));
                 }
 
+                picURL = fb.getPictureURL(PictureSize.large);
+
                 // TODO fb.getVideos (logged in or not)
 
                 // TODO fb.getInterests etc.
-                // TODO fb.getFamily ??
 
             }
 
 		} catch (FacebookException e) {
 			System.err.println("   ERROR getting facebook profile");
 			e.printStackTrace();
+			return fs;
 		}
-
-		System.out.println("   Processing the user's profile data");
 
 		if (u.getLanguages() != null) {
 			for (int i = 0; i < u.getLanguages().size(); i++) {
@@ -80,17 +85,13 @@ public class FacebookMiner {
 		if (u.getMiddleName() != null) 			fs.addFact(new Fact<>("Middle Name", u.getMiddleName(), rootFact));
 		if (u.getLastName() != null) 			fs.addFact(new Fact<>("Last Name", u.getLastName(), rootFact));
 		if (u.getUsername() != null) 			fs.addFact(new Fact<>("Username", u.getUsername(), rootFact));
-		if (u.getPicture() != null && !u.getPicture().isSilhouette())
-		                                        fs.addFact(new Fact<>("Image URL", u.getPicture().getURL().toString(), rootFact));
+		if (picURL != null)                     fs.addFact(new Fact<>("Image URL", picURL.toString(), rootFact));
 		if (u.getAgeRange() != null) {
 		    // Get current date.
             Calendar max = Calendar.getInstance();
             Calendar min = Calendar.getInstance();
 
-            // Subtract the ages
-
-			System.out.println(u.getAgeRange());
-
+            // Subtract the ages to get birth dates then add as facts
 			if (u.getAgeRange().getMin() != null) {
                 max.add(Calendar.YEAR, -u.getAgeRange().getMin());
                 Fact minAgeFact = new Fact<>("Min Age", u.getAgeRange().getMin(), rootFact);
@@ -128,10 +129,13 @@ public class FacebookMiner {
 		if (u.getLocale() != null)				fs.addFact(new Fact<>("Locale", u.getLocale(), rootFact));
 		if (u.getLink() != null)				fs.addFact(new Fact<>("Linked URL", u.getLink().toString(), rootFact));
 		if (u.getRelationshipStatus() != null)	fs.addFact(new Fact<>("Relationship Status", u.getRelationshipStatus(), rootFact));
-		if (u.getPolitical() != null)			fs.addFact(new Fact<>("Politics", u.getPolitical(), rootFact));
-		if (u.getReligion() != null)			fs.addFact(new Fact<>("Religion", u.getReligion(), rootFact));
+		if (u.getPolitical() != null && !u.getPolitical().equals("None ()"))
+												fs.addFact(new Fact<>("Politics", u.getPolitical(), rootFact));
+		if (u.getReligion() != null && !u.getReligion().equals("None ()"))
+												fs.addFact(new Fact<>("Religion", u.getReligion(), rootFact));
 		if (u.getWebsite() != null)				fs.addFact(new Fact<>("Linked URL", u.getWebsite().toString(), rootFact));
-		if (u.getInterestedIn() != null)		fs.addFact(new Fact<>("Interest In", u.getInterestedIn(), rootFact));
+		if (u.getInterestedIn() != null && !u.getInterestedIn().isEmpty())
+												fs.addFact(new Fact<>("Interest In", u.getInterestedIn(), rootFact));
         if (u.getSignificantOther() != null)    fs.addFact(new Fact<>("Partner", u.getSignificantOther().getName(), rootFact));
         if (u.getCover() != null)               fs.addFact(new Fact<>("Image URL", u.getCover().getSource(), rootFact));
 

@@ -29,6 +29,7 @@ public class AnalyserTest {
         fb.addFact(new Fact<>("First Name", "Christopher", fbRoot));
         fb.addFact(new Fact<>("Last Name", "Milner", fbRoot));
         fb.addFact(new Fact<>("Image URL", "http://example.com/image.png", fbRoot));
+        fb.addFact(new Fact<>("Relationship Status", "Single", fbRoot));
 
         try {
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");

@@ -33,7 +33,7 @@ public class TextAnalyser {
                 conclusions.add(new Conclusion<>(conclusionName, kw, 1, sources));
             }
 
-            if (mp.isByUser()) conclusions.addAll(analysePost(mp.getContent(), post));
+//            if (mp.isByUser()) conclusions.addAll(analysePost(mp.getContent(), post));
         }
 
         return conclusions;

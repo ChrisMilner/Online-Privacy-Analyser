@@ -31,6 +31,9 @@ public class Analyser {
 
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
+        System.out.println("   Analysing Posts");
+        conclusions.addAll(TextAnalyser.analyse(f));
+
         System.out.println("   Breaking down Name Parts");
         analyseName(f);
 
@@ -41,18 +44,26 @@ public class Analyser {
         conclusions.addAll(analyseNameParts(f));
 
         System.out.println("   Analysing Gender");
-        Conclusion gender = analyseGender(f);
-        if (gender != null)
-            conclusions.add(gender);
+        Conclusion gender = decideBetweenFacts(f, "Gender");
+        if (gender != null) conclusions.add(gender);
 
         System.out.println("   Analysing Birth Dates");
         conclusions.addAll(analyseBirthDate(f));
 
+        System.out.println("   Analysing Relationships");
+        Conclusion relationship = decideBetweenFacts(f, "Relationship Status");
+        if (relationship != null) conclusions.add(relationship);
+
+        System.out.println("   Analysing Religion");
+        Conclusion religion = decideBetweenFacts(f, "Religion");
+        if (religion != null) conclusions.add(religion);
+
+        System.out.println("   Analysing Politics");
+        Conclusion politics = decideBetweenFacts(f, "Politics");
+        if (politics != null) conclusions.add(politics);
+
         System.out.println("   Analysing Images");
         conclusions.addAll(analyseImages(f));
-
-        System.out.println("   Analysing Posts");
-        conclusions.addAll(TextAnalyser.analyse(f));
 
         System.out.println("\n - ANALYSER FINISHED - \n");
 
@@ -315,19 +326,19 @@ public class Analyser {
         return  conclusions;
     }
 
-    private static Conclusion<String> analyseGender(FactBook f) {
-        ArrayList<Fact> sources = new ArrayList<>();
-        ArrayList<Fact> genders = f.getFactsWithName("Gender");
+    private static Conclusion decideBetweenFacts(FactBook f, String factName) {
+        ArrayList<Fact> facts = f.getFactsWithName(factName);
 
-        if (genders.isEmpty()) return null;
+        if (facts.isEmpty()) return null;
 
-        ArrayList<Conclusion> conclusions = factsToConclusions(genders);
+        ArrayList<Conclusion> conclusions = factsToConclusions(facts);
         combineEqualConclusions(conclusions);
-        Conclusion c = getHighestConfidenceConclusion(conclusions);
+        Conclusion<String> c = getHighestConfidenceConclusion(conclusions);
 
-        String value = Util.uppercaseFirstLetter((String) c.getValue());
-        return new Conclusion<String>(c.getName(), value, c.getConfidence(), c.getSources());
+        String value = Util.uppercaseFirstLetter(c.getValue());
+        return new Conclusion<>(c.getName(), value, c.getConfidence(), c.getSources());
     }
+
 
     private static ArrayList<Conclusion> factsToConclusions(ArrayList<Fact> facts) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
