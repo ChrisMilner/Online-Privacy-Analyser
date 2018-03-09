@@ -79,10 +79,13 @@ public class TextAnalyser {
         if (!sbj.equals("i") && !sbj.equals("we")) {
             if (spo[3].equals("be")) {
                 String rebuiltClause = spo[0] + " " + spo[1] + " " + spo[2];
-                return new Conclusion<>("Statement", "Belief:" + rebuiltClause, 1, sources);
+
+                System.out.println("Conclusion: Belief: " + rebuiltClause);
+                return new Conclusion<>("Belief", rebuiltClause, 1, sources);
             } else return null;
         }
 
+        System.out.println("Conclusion: Statement: " + spo[3] + ":" + spo[2]);
         return new Conclusion<>("Statement", spo[3] + ":" + spo[2], 1, sources);
     }
 
