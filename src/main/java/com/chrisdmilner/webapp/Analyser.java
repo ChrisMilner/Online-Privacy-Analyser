@@ -57,11 +57,11 @@ public class Analyser {
         if (relationship != null) conclusions.add(relationship);
 
         System.out.println("   Analysing Religion");
-        Conclusion religion = decideBetweenFacts(f, "Religion");
+        Conclusion religion = analyseReligionPolitics(f, "Religion");
         if (religion != null) conclusions.add(religion);
 
         System.out.println("   Analysing Politics");
-        Conclusion politics = decideBetweenFacts(f, "Politics");
+        Conclusion politics = analyseReligionPolitics(f, "Politics");
         if (politics != null) conclusions.add(politics);
 
         System.out.println("   Analysing Images");
@@ -387,6 +387,18 @@ public class Analyser {
         }
 
         return decideBetweenFacts(days);
+    }
+
+    private static Conclusion analyseReligionPolitics(FactBook f, String name) {
+        ArrayList<Fact> facts = f.getFactsWithName(name);
+        ArrayList<Fact> correctedFacts = new ArrayList<>();
+
+        for (Fact fact : facts) {
+            String value = ((String) fact.getValue()).replaceAll("\\(.*\\)", "").trim();
+            correctedFacts.add(new Fact<>(name, value, fact));
+        }
+
+        return decideBetweenFacts(correctedFacts);
     }
 
     private static ArrayList<Conclusion> getFactsAsConclusions(FactBook f, String factName) {
