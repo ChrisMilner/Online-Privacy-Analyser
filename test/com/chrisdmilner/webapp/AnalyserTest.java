@@ -162,7 +162,7 @@ public class AnalyserTest {
         f.addFact(new Fact<>("Min Birth Date", df.parse("1996"), rdRoot));
         f.addFact(new Fact<>("Min Birth Date", df.parse("1990"), rdRoot));
 
-        ArrayList<Conclusion> conclusions = Analyser.analyseBirthDate(f);
+        ArrayList<Conclusion> conclusions = Analyser.analyseBirthYear(f);
         assertEquals("1997", conclusions.get(0).getValue());
         assertEquals("20 - 21", conclusions.get(1).getValue());
     }

@@ -43,7 +43,11 @@ public class Analyser {
         if (gender != null) conclusions.add(gender);
 
         System.out.println("   Analysing Birth Dates");
-        conclusions.addAll(analyseBirthDate(f));
+        conclusions.addAll(analyseBirthYear(f));
+        Conclusion month = analyseBirthMonth(f);
+        if (month != null) conclusions.add(month);
+        Conclusion day = analyseBirthDay(f);
+        if (day != null) conclusions.add(day);
 
         System.out.println("   Analysing Emails");
         conclusions.addAll(getFactsAsConclusions(f,"Email"));
@@ -193,7 +197,7 @@ public class Analyser {
         return false;
     }
 
-    protected static ArrayList<Conclusion> analyseBirthDate(FactBook f) {
+    protected static ArrayList<Conclusion> analyseBirthYear(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
         ArrayList<Fact> sources = new ArrayList<>();
 
@@ -309,6 +313,82 @@ public class Analyser {
         return dates;
     }
 
+    private static Conclusion analyseBirthMonth(FactBook f) {
+        ArrayList<Fact> months = f.getFactsWithName("Birth Month");
+        ArrayList<Fact> correctMonths = new ArrayList<>();
+
+        for (int i = 0; i < months.size(); i++) {
+            String month = getMonthName((String) months.get(i).getValue());
+            if (month != null)
+                correctMonths.add(new Fact<>("Birth Month", month, months.get(i)));
+        }
+
+        return decideBetweenFacts(correctMonths);
+    }
+
+    private static String getMonthName(String month) {
+        int num;
+        if (month.matches(".*\\d+.*")) {
+            num = Integer.parseInt(month);
+            if (num < 1 || num > 12) return null;
+        } else {
+            month = month.toLowerCase();
+            if (month.contains("jan"))
+                num = 1;
+            else if (month.contains("feb"))
+                num = 2;
+            else if (month.contains("mar"))
+                num = 3;
+            else if (month.contains("apr"))
+                num = 4;
+            else if (month.contains("may"))
+                num = 5;
+            else if (month.contains("jun"))
+                num = 6;
+            else if (month.contains("jul"))
+                num = 7;
+            else if (month.contains("aug"))
+                num = 8;
+            else if (month.contains("sep"))
+                num = 9;
+            else if (month.contains("oct"))
+                num = 10;
+            else if (month.contains("nov"))
+                num = 11;
+            else if (month.contains("dec"))
+                num = 12;
+            else return null;
+        }
+
+        switch (num) {
+            case 1: return "January";
+            case 2: return "February";
+            case 3: return "March";
+            case 4: return "April";
+            case 5: return "May";
+            case 6: return "June";
+            case 7: return "July";
+            case 8: return "August";
+            case 9: return "September";
+            case 10: return "October";
+            case 11: return "November";
+            case 12: return "December";
+        }
+
+        return null;
+    }
+
+    private static Conclusion analyseBirthDay(FactBook f) {
+        ArrayList<Fact> days = f.getFactsWithName("Birth Day");
+
+        for (int i = 0; i < days.size(); i++) {
+            int num = Integer.parseInt((String) days.get(i).getValue());
+            if (num < 1 || num > 31) days.remove(i);
+        }
+
+        return decideBetweenFacts(days);
+    }
+
     private static ArrayList<Conclusion> getFactsAsConclusions(FactBook f, String factName) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
         ArrayList<Fact> facts = f.getFactsWithName(factName);
@@ -323,9 +403,7 @@ public class Analyser {
         return conclusions;
     }
 
-    private static Conclusion decideBetweenFacts(FactBook f, String factName) {
-        ArrayList<Fact> facts = f.getFactsWithName(factName);
-
+    private static Conclusion decideBetweenFacts(ArrayList<Fact> facts) {
         if (facts.isEmpty()) return null;
 
         ArrayList<Conclusion> conclusions = factsToConclusions(facts);
@@ -334,6 +412,11 @@ public class Analyser {
 
         String value = Util.uppercaseFirstLetter(c.getValue());
         return new Conclusion<>(c.getName(), value, c.getConfidence(), c.getSources());
+    }
+
+    private static Conclusion decideBetweenFacts(FactBook f, String factName) {
+        ArrayList<Fact> facts = f.getFactsWithName(factName);
+        return decideBetweenFacts(facts);
     }
 
 
