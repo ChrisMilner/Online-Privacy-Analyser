@@ -11,16 +11,12 @@ public class Analyser {
 
     // TODO:
     //  - Education
+    //  - Work
     //  - Locations (Map?)
     //  - Email(s)
     //  - Interests
-    //  - Politics
-    //  - Religion
     //  - Sexuality
-    //  - Partner
-    //  - Jobs
     //  - Languages
-    //  - Friends
     //  - Birth Month and Day
     //  - Online Activity (Graph)
 
@@ -50,6 +46,9 @@ public class Analyser {
         System.out.println("   Analysing Birth Dates");
         conclusions.addAll(analyseBirthDate(f));
 
+        System.out.println("   Analysing Emails");
+        conclusions.addAll(getFactsAsConclusions(f,"Email"));
+
         System.out.println("   Analysing Relationships");
         Conclusion relationship = decideBetweenFacts(f, "Relationship Status");
         if (relationship != null) conclusions.add(relationship);
@@ -63,7 +62,7 @@ public class Analyser {
         if (politics != null) conclusions.add(politics);
 
         System.out.println("   Analysing Images");
-        conclusions.addAll(analyseImages(f));
+        conclusions.addAll(getFactsAsConclusions(f,"Image URL"));
 
         System.out.println("\n - ANALYSER FINISHED - \n");
 
@@ -311,19 +310,18 @@ public class Analyser {
         return dates;
     }
 
-    private static ArrayList<Conclusion> analyseImages(FactBook f) {
+    private static ArrayList<Conclusion> getFactsAsConclusions(FactBook f, String factName) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
+        ArrayList<Fact> facts = f.getFactsWithName(factName);
 
-        ArrayList<Fact> imageURLs = f.getFactsWithName("Image URL");
-
-        for (Fact url : imageURLs) {
-            double confidence =  getConfidenceFromSource(url.getSource());
+        for (Fact fact : facts) {
+            double confidence =  getConfidenceFromSource(fact);
             ArrayList<Fact> sources = new ArrayList<>();
-            sources.add(url);
-            conclusions.add(new Conclusion<>("Image URL", (String) url.getValue(), confidence, sources));
+            sources.add(fact);
+            conclusions.add(new Conclusion<>(fact.getName(), (String) fact.getValue(), confidence, sources));
         }
 
-        return  conclusions;
+        return conclusions;
     }
 
     private static Conclusion decideBetweenFacts(FactBook f, String factName) {
