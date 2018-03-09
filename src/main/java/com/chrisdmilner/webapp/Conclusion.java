@@ -1,5 +1,9 @@
 package com.chrisdmilner.webapp;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 // Stores a belief concluded on by the Analyser
@@ -51,16 +55,19 @@ public class Conclusion<T> {
 	}
 
 	// Converts the conclusion to a JSON format.
-	public String toJSON() {
-		String out = "{\"name\":\"" + name + "\", \"value\":\"" + value + "\", \"confidence\":" + confidence + ", \"sources\":[";
-		
-		for (int i = 0; i < sources.size(); i++) {
-			out += sources.get(i).toJSON();
-			if (i < sources.size() - 1) out += ", ";
-		}
-		out += "]}";
+	public JSONObject toJSON() throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("name", name);
+		json.put("value", value);
+		json.put("confidence", confidence);
 
-		return out;
+        JSONArray srcs = new JSONArray();
+        for (Fact s : sources)
+            srcs.put(s.toJSON());
+
+        json.put("sources", srcs);
+
+        return json;
 	}
 
 }

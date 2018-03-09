@@ -60,7 +60,7 @@ public class RedditMiner {
         List<PublicContribution<?>> posts = postPaginator.accumulateMerged(-1);
         for (PublicContribution<?> post : posts) {
             Submission postData = ((SubmissionReference) post.toReference(reddit)).inspect();
-            String content = postData.getTitle() + "\n" + postData.getSelfText();
+            String content = postData.getTitle() + ": " + postData.getSelfText();
             String[] media = {postData.getUrl()};
         	curr = new MinedPost(post.getCreated(), null, null, null, content, media, true);
             fb.addFact(new Fact<>("Posted", curr, rootFact));

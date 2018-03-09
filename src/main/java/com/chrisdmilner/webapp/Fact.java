@@ -1,5 +1,8 @@
 package com.chrisdmilner.webapp;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 // Stores a fact extracted by the Miner.
 public class Fact<T> {
 
@@ -41,14 +44,15 @@ public class Fact<T> {
 		return out;
 	}
 
-	public String toJSON() {
-	    String out = "{\"name\":\"" + name + "\", \"value\":\"" + value.toString() + "\", \"source\":";
+	public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("name", name);
+        json.put("value", value.toString());
 
-	    if (source != null) out += source.toJSON();
-	    else out += "{}";
+        if (source != null) json.put("source", source.toJSON());
+        else json.put("source", new JSONObject());
 
-	    out += "}";
-	    return out;
+        return json;
 	}
 
 }

@@ -13,7 +13,6 @@ public class Analyser {
     //  - Education
     //  - Work
     //  - Locations (Map?)
-    //  - Email(s)
     //  - Interests
     //  - Sexuality
     //  - Languages
@@ -33,11 +32,11 @@ public class Analyser {
         System.out.println("   Breaking down Name Parts");
         analyseName(f);
 
-        System.out.println("   Analysing Account Creation Dates");
-        analyseCreatedAtDates(f);
-
         System.out.println("   Analysing the Name Parts");
         conclusions.addAll(analyseNameParts(f));
+
+        System.out.println("   Analysing Account Creation Dates");
+        analyseCreatedAtDates(f);
 
         System.out.println("   Analysing Gender");
         Conclusion gender = decideBetweenFacts(f, "Gender");

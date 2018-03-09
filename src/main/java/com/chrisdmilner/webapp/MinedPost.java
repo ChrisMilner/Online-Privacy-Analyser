@@ -54,11 +54,12 @@ public class MinedPost {
     }
 
 	public String toString() {
-		String out = createdTime + " : " + location + " : " + place + " : " + content + " : ";
+//		String out = createdTime + " : " + location + " : " + place + " : " + content.replaceAll("\n", "\\n") + " : ";
 
-		for (String url : mediaURLs)
-		    out += url;
+//		for (String url : mediaURLs)
+//		    out += url;
 
-		return out;
+//		return out;
+		return content;
 	}
 }

@@ -1,5 +1,10 @@
 package com.chrisdmilner.webapp;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+
 import java.util.ArrayList;
 
 // Contains functions related to general data mining
@@ -49,33 +54,39 @@ public class Miner {
 		// writeConclusionsToFile(id, conclusions);
 	}
 
-	protected static String conclusionsToJSON(ArrayList<Conclusion> c) {
-        String json = "";
+	protected static String conclusionsToJSON(ArrayList<Conclusion> cs) {
+        JSONObject json;
+        try {
+            json = new JSONObject();
+            JSONArray conclusions = new JSONArray();
 
-	    json += "{\"conclusions\":[";
-        for (int i = 0; i < c.size(); i++) {
-            json += c.get(i).toJSON();
-            if (i < c.size() - 1) json += ",";
+            for (Conclusion c : cs)
+                conclusions.put(c.toJSON());
+
+            json.put("conclusions", conclusions);
+        } catch (JSONException e) {
+            System.err.println("ERROR converting conclusions to JSON");
+            e.printStackTrace();
+            return null;
         }
-        json += "]}";
 
-        return json;
-    }
+        return json.toString();
+	}
 
 	// Writes a list of conclusions into a file in JSON format.
-	private static void writeConclusionsToFile(int id, ArrayList<Conclusion> c) {
-		ArrayList<String> lines = new ArrayList<>();
-		
-		// Create the JSON files lines.
-		lines.add("{\"conclusions\":[");
-		for (int i = 0; i < c.size(); i++) {
-			lines.add(c.get(i).toJSON());
-			if (i < c.size() - 1) lines.set(i, lines.get(i) + ",");
-		}
-		lines.add("]}");
-
-		// Output the list of lines to a file
-		Util.outputToFile("../outputs/" + id + ".data", lines);
-	}
+//	private static void writeConclusionsToFile(int id, ArrayList<Conclusion> c) {
+//		ArrayList<String> lines = new ArrayList<>();
+//
+//		// Create the JSON files lines.
+//		lines.add("{\"conclusions\":[");
+//		for (int i = 0; i < c.size(); i++) {
+//			lines.add(c.get(i).toJSON());
+//			if (i < c.size() - 1) lines.set(i, lines.get(i) + ",");
+//		}
+//		lines.add("]}");
+//
+//		// Output the list of lines to a file
+//		Util.outputToFile("../outputs/" + id + ".data", lines);
+//	}
 
 }

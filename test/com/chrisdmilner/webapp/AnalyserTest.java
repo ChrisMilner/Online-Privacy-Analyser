@@ -136,6 +136,12 @@ public class AnalyserTest {
                 assertEquals("Male", c.getValue());
             System.out.println(c.toString());
         }
+
+        // Test if the generated JSON is valid.
+        String json = Miner.conclusionsToJSON(conclusions);
+        System.out.println(json);
+
+        new JSONObject(json);
     }
 
     @Test

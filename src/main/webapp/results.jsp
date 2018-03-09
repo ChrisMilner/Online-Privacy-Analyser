@@ -176,13 +176,13 @@
                     <%
                 }
 
-                for (int i = 0;i < keywords.size(); i++) {
+                for (int i = 0; i < keywords.size(); i++) {
                     JSONObject kw = keywords.get(i);
                     JSONObject primarySource = (JSONObject) kw.getJSONArray("sources").get(0);
                     String keyword = (String) kw.get("value");
                     String fullText = primarySource.getString("value");
 
-                    int start = fullText.indexOf(keyword);
+                    int start = fullText.toLowerCase().indexOf(keyword);
                     int end = start + keyword.length();
 
                     String before = fullText.substring(0, start);
@@ -249,6 +249,9 @@
 
         } catch (JSONException e) {
             System.err.println("ERROR decoding the conclusion JSON.");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("ERROR formatting conclusions");
             e.printStackTrace();
         }
 
