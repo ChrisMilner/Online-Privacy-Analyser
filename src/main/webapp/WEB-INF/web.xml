@@ -8,8 +8,17 @@
         <servlet-name>Analyse</servlet-name>
         <servlet-class>com.chrisdmilner.webapp.Analyse</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Update</servlet-name>
+        <servlet-class>com.chrisdmilner.webapp.Update</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>Analyse</servlet-name>
         <url-pattern>/analyse</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Update</servlet-name>
+        <url-pattern>/update</url-pattern>
     </servlet-mapping>
 </web-app>

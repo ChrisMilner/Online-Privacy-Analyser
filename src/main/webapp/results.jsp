@@ -46,6 +46,7 @@
             <th>Name</th>
             <th>Value</th>
             <th>Confidence</th>
+            <th>Correct?</th>
             <th>Sources</th>
         </tr>
 
@@ -87,6 +88,7 @@
                 <td><%= name %></td>
                 <td><%= value %></td>
                 <td><%= confidence %></td>
+                <td class="correct yes">Yes</td>
                 <td class="sources">Expand</td>
             </tr>
 
@@ -101,6 +103,7 @@
                     <tr class="hidden" style ="background-color:rgba(0,0,0,0.05)" data-srcno="1">
                         <td><%= name %></td>
                         <td><%= value %></td>
+                        <td>-</td>
                         <td>-</td>
                         <td class="sources">Expand</td>
                     </tr>
@@ -128,6 +131,7 @@
                         <tr class="hidden" style ="background-color:rgba(0,0,0,<%= depth * 0.05 %>)" data-srcno=<%= srcno %>>
                             <td><%= name %></td>
                             <td><%= value %></td>
+                            <td>-</td>
                             <td>-</td>
                             <td class="sources"><%= sourceText %></td>
                         </tr>

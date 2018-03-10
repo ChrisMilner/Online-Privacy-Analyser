@@ -533,8 +533,6 @@ public class Analyser {
     private static double getConfidenceFromSource(Fact source) {
         double confidence = 1;
 
-        // TODO: Add all possible fact names to switch statement.
-
         Fact s = source;
         while (s != null) {
             switch (s.getName()) {

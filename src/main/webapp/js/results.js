@@ -53,7 +53,67 @@ window.onload = function () {
         while (sources.getElementsByTagName("tr").length > 1) {
             sources.deleteRow(1);
         }
+    };
+
+    var correctCells = document.getElementsByClassName("correct");
+    for (i = 0; i < correctCells.length; i++) {
+        correctCells[i].onclick = function () {
+            if (this.classList.contains("yes")) {
+                this.classList.remove("yes");
+                this.innerHTML = "No";
+            } else {
+                this.classList.add("yes");
+                this.innerHTML = "Yes";
+            }
+        }
     }
+};
+
+window.onbeforeunload = function() {
+    var fbc = 0;
+    var fbw = 0;
+    var twc = 0;
+    var tww = 0;
+    var rdc = 0;
+    var rdw = 0;
+
+    var correctCells = document.getElementsByClassName("correct");
+    for (var i = 0; i < correctCells.length; i++) {
+        var cell = correctCells[i];
+        var row = cell.parentElement;
+        var noOfSources = row.getAttribute("data-srcno");
+        var increase = 1 / noOfSources;
+        var correct = cell.classList.contains("yes");
+
+        var srcRow = row.nextElementSibling;
+        for (var j = 0; j < noOfSources; j++) {
+            // Trace source to root
+            var nestedSrcNo = Number(srcRow.getAttribute("data-srcno"));
+            var nestedRow = srcRow;
+            while (nestedSrcNo !== 0) {
+                nestedRow = nestedRow.nextElementSibling;
+                nestedSrcNo = Number(nestedRow.getAttribute("data-srcno"));
+            }
+
+            var rootText = nestedRow.cells[0].innerHTML;
+            if (rootText === "Facebook Account") {
+                if (correct) fbc += increase;
+                else fbw += increase;
+            } else if (rootText === "Twitter Account") {
+                if (correct) twc += increase;
+                else tww += increase;
+            } else if (rootText === "Reddit Account") {
+                if (correct) rdc += increase;
+                else rdw += increase;
+            }
+
+            srcRow = nestedRow.nextElementSibling;
+        }
+    }
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "update?fbc="+fbc+"&fbw="+fbw+"&twc="+twc+"&tww="+tww+"&rdc="+rdc+"&rdw="+rdw, true);
+    xhttp.send();
 };
 
 function openSources(row) {

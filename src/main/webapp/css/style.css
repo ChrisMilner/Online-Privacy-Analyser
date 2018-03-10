@@ -376,6 +376,15 @@ input[type="submit"]:hover {
     color: white;
 }
 
+#conclusions td.correct {
+    cursor: pointer;
+    background-color: rgb(250,150,120);
+}
+
+#conclusions td.correct.yes {
+    background-color: rgb(150,250,120);
+}
+
 #images {
     width: 80%;
     border-collapse: collapse;
