@@ -427,12 +427,12 @@ public class Analyser {
                 value += mp.getInstitution();
             }
 
-            if (mp.getStartYear() != null && mp.getEndYear() != null) {
+            if (mp.getStartYear() != null && !mp.getStartYear().equals("0000-00") && mp.getEndYear() != null && !mp.getEndYear().equals("0000-00")) {
                 value += " (" + mp.getStartYear() + " - " + mp.getEndYear() + ")";
-            } else if (mp.getStartYear() != null) {
+            } else if (mp.getStartYear() != null && !mp.getStartYear().equals("0000-00")) {
                 value += " (" + mp.getStartYear() + " - Present)";
-            } else if (mp.getEndYear() != null) {
-                value += " (Until " + mp.getEndYear() + ")";
+            } else if (mp.getEndYear() != null && !mp.getEndYear().equals("0000-00")) {
+                value += " (" + mp.getEndYear() + ")";
             }
 
             ArrayList<Fact> sources = new ArrayList<>();

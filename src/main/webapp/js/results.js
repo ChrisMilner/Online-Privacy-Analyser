@@ -74,7 +74,7 @@ var geocoder;
 function myMap() {
     var mapOptions = {
         center: new google.maps.LatLng(52.4, -1.5),
-        zoom: 6,
+        zoom: 2,
         mapTypeId: google.maps.MapTypeId.HYBRID
     };
 
@@ -90,12 +90,15 @@ function myMap() {
 function addMarkerAtAddress(address) {
     geocoder.geocode( { 'address': address}, function(results, status) {
         if (status == 'OK') {
-            var marker = new google.maps.Marker({
-                map: map,
-                position: results[0].geometry.location
-            });
+            console.log(results[0].types);
+            if (!results[0].types.includes("country") && !results[0].types.includes("administrative_area_level_1")) {
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+            }
         } else {
-            alert('Geocode was not successful for the following reason: ' + status);
+            console.log('Geocode was not successful for the following reason: ' + status);
         }
     });
 }
