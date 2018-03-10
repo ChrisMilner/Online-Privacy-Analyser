@@ -177,7 +177,6 @@
 
             </table>
             <h2 class="subtitle">Locations</h2>
-            <%--<div class="location-data" data-addr="Abbey College, Ramsey"></div>--%>
             <%
                 for (JSONObject location : locations) {
                     %>

@@ -69,6 +69,9 @@ public class Analyser {
         System.out.println("   Analysing Work and Education");
         conclusions.addAll(analyseWorkEducation(f));
 
+        System.out.println("   Analysing Locations");
+        conclusions.addAll(getFactsAsConclusions(f, "Location"));
+
         System.out.println("   Analysing Images");
         conclusions.addAll(getFactsAsConclusions(f,"Image URL"));
 

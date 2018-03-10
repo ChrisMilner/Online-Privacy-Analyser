@@ -123,10 +123,10 @@ public class FacebookMiner {
 		if (u.getGender() != null) 				fs.addFact(new Fact<>("Gender", u.getGender(), rootFact));
 		if (u.getTimezone() != null) 			fs.addFact(new Fact<>("Time Zone", u.getTimezone(), rootFact));
 		if (u.getHometown() != null && u.getHometown().getName()!=null)
-		                                        fs.addFact(new Fact<>("Home Town", u.getHometown().getName(), rootFact));
+		                                        fs.addFact(new Fact<>("Location", u.getHometown().getName(), rootFact));
 		if (u.getLocation() != null && u.getLocation().getName()!=null)
 		                                        fs.addFact(new Fact<>("Location", u.getLocation().getName(), rootFact));
-		if (u.getLocale() != null)				fs.addFact(new Fact<>("Locale", u.getLocale(), rootFact));
+		if (u.getLocale() != null)				fs.addFact(new Fact<>("Location", u.getLocale().getDisplayCountry(), rootFact));
 		if (u.getLink() != null)				fs.addFact(new Fact<>("Linked URL", u.getLink().toString(), rootFact));
 		if (u.getRelationshipStatus() != null)	fs.addFact(new Fact<>("Relationship Status", u.getRelationshipStatus(), rootFact));
 		if (u.getPolitical() != null && !u.getPolitical().equals("None ()"))
