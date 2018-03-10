@@ -68,6 +68,9 @@ public class Analyser {
         Conclusion politics = analyseReligionPolitics(f, "Politics");
         if (politics != null) conclusions.add(politics);
 
+        System.out.println("   Analysing Work and Education");
+        conclusions.addAll(analyseWorkEducation(f));
+
         System.out.println("   Analysing Images");
         conclusions.addAll(getFactsAsConclusions(f,"Image URL"));
 
@@ -403,6 +406,40 @@ public class Analyser {
         }
 
         return decideBetweenFacts(correctedFacts);
+    }
+
+    private static ArrayList<Conclusion> analyseWorkEducation(FactBook f) {
+        ArrayList<Conclusion> conclusions = new ArrayList<>();
+
+        ArrayList<Fact> periods = f.getFactsWithName("Work");
+        periods.addAll(f.getFactsWithName("Education"));
+        for (Fact p : periods) {
+            MinedPeriod mp = (MinedPeriod) p.getValue();
+
+            String value = "";
+            if (mp.getDiscipline() != null) {
+                value += mp.getDiscipline();
+                if (mp.getInstitution() != null) {
+                    value += " at " + mp.getInstitution();
+                }
+            } else if (mp.getInstitution() != null) {
+                value += mp.getInstitution();
+            }
+
+            if (mp.getStartYear() != null && mp.getEndYear() != null) {
+                value += " (" + mp.getStartYear() + " - " + mp.getEndYear() + ")";
+            } else if (mp.getStartYear() != null) {
+                value += " (" + mp.getStartYear() + " - Present)";
+            } else if (mp.getEndYear() != null) {
+                value += " (Until " + mp.getEndYear() + ")";
+            }
+
+            ArrayList<Fact> sources = new ArrayList<>();
+            sources.add(p);
+            conclusions.add(new Conclusion<>(p.getName(), value, getConfidenceFromSource(p), sources));
+        }
+
+        return conclusions;
     }
 
     private static ArrayList<Conclusion> getFactsAsConclusions(FactBook f, String factName) {

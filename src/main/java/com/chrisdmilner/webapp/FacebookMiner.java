@@ -141,14 +141,23 @@ public class FacebookMiner {
 
         if (u.getEducation() != null) {
             List<User.Education> educations = u.getEducation();
-            for (User.Education edu : educations)
-                fs.addFact(new Fact<>("Education", edu, rootFact));
+            for (User.Education edu : educations) {
+                String degree = edu.getDegree() == null ? null : edu.getDegree().getName();
+                String school = edu.getSchool() == null ? null : edu.getSchool().getName();
+                String year = edu.getYear() == null ? null : edu.getYear().getName();
+                MinedPeriod mp = new MinedPeriod(degree, school, null, year);
+                fs.addFact(new Fact<>("Education", mp, rootFact));
+            }
         }
 
         if (u.getWork() != null) {
             List<User.Work> work = u.getWork();
-            for (User.Work w : work)
-                fs.addFact(new Fact<>("Work", w, rootFact));
+            for (User.Work w : work) {
+                String position = w.getPosition() == null ? null : w.getPosition().getName();
+                String employer = w.getEmployer() == null ? null : w.getEmployer().getName();
+                MinedPeriod mp = new MinedPeriod(position, employer, w.getStartDate(), w.getEndDate());
+                fs.addFact(new Fact<>("Work", mp, rootFact));
+        	}
         }
 
         System.out.println("\n - FACEBOOK MINER FINISHED - \n");
@@ -174,9 +183,5 @@ public class FacebookMiner {
 
 		return cb;
 	}
-
-//	private static String getURLFromImageID(Facebook fb, String id) throws FacebookException {
-//        return fb.getPhoto(id).getLink().toString();
-//    }
 
 }
