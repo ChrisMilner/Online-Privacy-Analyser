@@ -1,5 +1,6 @@
 package com.chrisdmilner.webapp;
 
+import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,17 +13,20 @@ public class Analyser {
     // TODO:
     //  - Education
     //  - Work
+    //  - Sexuality
     //  - Locations (Map?)
     //  - Interests
-    //  - Sexuality
     //  - Languages
-    //  - Birth Month and Day
     //  - Online Activity (Graph)
 
     private final static int CURRENT_YEAR = 2018;
+    private static double FB_ROOT_CONF;
+    private static double TW_ROOT_CONF;
+    private static double RD_ROOT_CONF;
 
     public static ArrayList<Conclusion> analyse(FactBook f) {
         System.out.println("\n - STARTING ANALYSER - \n");
+        setRootConfidences();
 
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
@@ -534,9 +538,9 @@ public class Analyser {
         Fact s = source;
         while (s != null) {
             switch (s.getName()) {
-                case "Facebook Account":    confidence *= 0.95; break;
-                case "Twitter Account":      confidence *= 0.7; break;
-                case "Reddit Account":    confidence *= 0.4; break;
+                case "Facebook Account":    confidence *= FB_ROOT_CONF; break;
+                case "Twitter Account":      confidence *= TW_ROOT_CONF; break;
+                case "Reddit Account":    confidence *= RD_ROOT_CONF; break;
 
                 default: confidence *= 1;
             }
@@ -545,6 +549,30 @@ public class Analyser {
         }
 
         return confidence;
+    }
+
+    private static void setRootConfidences() {
+        try {
+            String file = Util.readFileToString(Util.getResourceURI() + "properties/confidence.properties");
+
+            FB_ROOT_CONF = Double.parseDouble(Util.getConfigParameter(file, "fb="));
+            TW_ROOT_CONF = Double.parseDouble(Util.getConfigParameter(file, "tw="));
+            RD_ROOT_CONF = Double.parseDouble(Util.getConfigParameter(file, "rd="));
+        } catch (FileNotFoundException e) {
+            System.err.println("ERROR: Confidence Properties File Not Found");
+            e.printStackTrace();
+            System.out.println("Using default values instead.");
+
+            FB_ROOT_CONF = 0.95;
+            TW_ROOT_CONF = 0.7;
+            RD_ROOT_CONF = 0.4;
+        }
+
+
+        System.out.println("   Root Confidences Intialised");
+        System.out.println("      Facebook: " + FB_ROOT_CONF);
+        System.out.println("      Twitter: " + TW_ROOT_CONF);
+        System.out.println("      Reddit: " + RD_ROOT_CONF);
     }
 
 }

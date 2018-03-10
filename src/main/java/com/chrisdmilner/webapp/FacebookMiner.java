@@ -175,8 +175,8 @@ public class FacebookMiner {
 		return cb;
 	}
 
-	private static String getURLFromImageID(Facebook fb, String id) throws FacebookException {
-        return fb.getPhoto(id).getLink().toString();
-    }
+//	private static String getURLFromImageID(Facebook fb, String id) throws FacebookException {
+//        return fb.getPhoto(id).getLink().toString();
+//    }
 
 }
