@@ -14,6 +14,7 @@
     <title>Results - Online Privacy Analyser</title>
 
     <script src="js/results.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDb-cm3QxEBRvIwXcaaSzd2-2e7Uxu7JfY&callback=myMap"></script>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="shortcut icon" href="images/favicon.ico" type="images/x-icon">
@@ -58,6 +59,7 @@
             ArrayList<JSONObject> images = new ArrayList<JSONObject>();
             ArrayList<JSONObject> keywords = new ArrayList<JSONObject>();
             ArrayList<JSONObject> sharedKeywords = new ArrayList<JSONObject>();
+            ArrayList<JSONObject> locations = new ArrayList<JSONObject>();
 
             JSONObject curr;
             String name;
@@ -77,10 +79,13 @@
                 } else if (name.equals("Keyword Shared")) {
                     sharedKeywords.add(curr);
                     continue;
+                } else if (name.equals("Location")) {
+                    locations.add(curr);
+                    continue;
                 }
 
                 value = curr.getString("value");
-                confidence = (Double.parseDouble(curr.getString("confidence")) * 100) + "%";
+                confidence = ((Math.round(Double.parseDouble(curr.getString("confidence")) * 10000)) / 100.0) + "%";
                 srcs = curr.getJSONArray("sources");
             %>
 
@@ -171,6 +176,16 @@
             %>
 
             </table>
+            <h2 class="subtitle">Locations</h2>
+            <%--<div class="location-data" data-addr="Abbey College, Ramsey"></div>--%>
+            <%
+                for (JSONObject location : locations) {
+                    %>
+                    <div class="location-data" data-addr=<%= "'" + location.getString("value") + "'" %>></div>
+                    <%
+                }
+            %>
+            <div id="map"></div>
             <h2 class="subtitle">Posted Keywords</h2>
             <%
 

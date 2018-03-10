@@ -69,6 +69,37 @@ window.onload = function () {
     }
 };
 
+var map;
+var geocoder;
+function myMap() {
+    var mapOptions = {
+        center: new google.maps.LatLng(52.4, -1.5),
+        zoom: 6,
+        mapTypeId: google.maps.MapTypeId.HYBRID
+    };
+
+    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+    geocoder = new google.maps.Geocoder();
+
+    var locations = document.getElementsByClassName("location-data");
+    for (var i = 0; i < locations.length; i++) {
+        addMarkerAtAddress(locations[i].getAttribute("data-addr"));
+    }
+}
+
+function addMarkerAtAddress(address) {
+    geocoder.geocode( { 'address': address}, function(results, status) {
+        if (status == 'OK') {
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location
+            });
+        } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+        }
+    });
+}
+
 window.onbeforeunload = function() {
     var fbc = 0;
     var fbw = 0;

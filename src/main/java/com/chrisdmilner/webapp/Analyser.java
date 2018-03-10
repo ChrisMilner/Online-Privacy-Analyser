@@ -11,8 +11,6 @@ import java.util.Date;
 public class Analyser {
 
     // TODO:
-    //  - Education
-    //  - Work
     //  - Sexuality
     //  - Locations (Map?)
     //  - Interests
@@ -436,7 +434,9 @@ public class Analyser {
 
             ArrayList<Fact> sources = new ArrayList<>();
             sources.add(p);
-            conclusions.add(new Conclusion<>(p.getName(), value, getConfidenceFromSource(p), sources));
+            double confidence =  getConfidenceFromSource(p);
+            conclusions.add(new Conclusion<>("Location", mp.getInstitution(), confidence, sources));
+            conclusions.add(new Conclusion<>(p.getName(), value, confidence, sources));
         }
 
         return conclusions;
