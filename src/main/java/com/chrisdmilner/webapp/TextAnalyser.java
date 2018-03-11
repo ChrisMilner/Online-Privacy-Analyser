@@ -33,37 +33,59 @@ public class TextAnalyser {
                 conclusions.add(new Conclusion<>(conclusionName, kw, 1, sources));
             }
 
-//            if (mp.isByUser()) conclusions.addAll(analysePost(mp.getContent(), post));
+            if (mp.isByUser()) conclusions.addAll(analysePost(post));
         }
 
         return conclusions;
     }
 
-    protected static ArrayList<Conclusion> analysePost(String post, Fact source) {
-        String[] clauses = post.split("\\. |\n|\t");
-
-        int count = 0;
-        for (int i = 0; i < clauses.length; i++) {
-            if (clauses[i].length() < 2)
-                clauses[i] = null;
-            else count++;
-        }
-
-        String[] processedClauses = new String[count];
-        int index = 0;
-        for (int i = 0; i < clauses.length; i++) {
-            if (clauses[i] != null)
-                processedClauses[index++] = clauses[i];
-        }
-
+    protected static ArrayList<Conclusion> analysePost(Fact post) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
+        MinedPost mp = (MinedPost) post.getValue();
 
-        for (int i = 0; i < processedClauses.length; i++) {
-            Conclusion result = analyseClause(processedClauses[i], source);
-            if (result != null) conclusions.add(result);
+        System.out.println("      Analysing: " + mp.getContent().split("\n")[0]);
+        System.out.println("         " + mp.getLocation());
+        System.out.println("         " + mp.getPlace());
+
+        if (mp.getLocation() != null) {
+            ArrayList<Fact> sources = new ArrayList<>();
+            sources.add(post);
+            String coord = mp.getLocation().getLatitude() + ", " + mp.getLocation().getLongitude();
+            System.out.println(coord);
+            conclusions.add(new Conclusion<>("Location", coord, Analyser.getConfidenceFromSource(post), sources));
+        } else if (mp.getPlace() != null) {
+            ArrayList<Fact> sources = new ArrayList<>();
+            sources.add(post);
+            String place = mp.getPlace().getFullName() + ", " + mp.getPlace().getCountry();
+            conclusions.add(new Conclusion<>("Location", place, Analyser.getConfidenceFromSource(post), sources));
         }
 
         return conclusions;
+
+//        String[] clauses = post.split("\\. |\n|\t");
+//
+//        int count = 0;
+//        for (int i = 0; i < clauses.length; i++) {
+//            if (clauses[i].length() < 2)
+//                clauses[i] = null;
+//            else count++;
+//        }
+//
+//        String[] processedClauses = new String[count];
+//        int index = 0;
+//        for (int i = 0; i < clauses.length; i++) {
+//            if (clauses[i] != null)
+//                processedClauses[index++] = clauses[i];
+//        }
+//
+//        ArrayList<Conclusion> conclusions = new ArrayList<>();
+//
+//        for (int i = 0; i < processedClauses.length; i++) {
+//            Conclusion result = analyseClause(processedClauses[i], source);
+//            if (result != null) conclusions.add(result);
+//        }
+//
+//        return conclusions;
     }
 
     private static Conclusion analyseClause(String clause, Fact source) {

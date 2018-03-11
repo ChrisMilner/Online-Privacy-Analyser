@@ -570,7 +570,7 @@ public class Analyser {
         return conclusions.get(index);
     }
 
-    private static double getConfidenceFromSource(Fact source) {
+    protected static double getConfidenceFromSource(Fact source) {
         double confidence = 1;
 
         Fact s = source;
