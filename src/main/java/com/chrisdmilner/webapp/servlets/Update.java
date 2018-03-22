@@ -1,4 +1,6 @@
-package com.chrisdmilner.webapp;
+package com.chrisdmilner.webapp.servlets;
+
+import com.chrisdmilner.webapp.Util;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

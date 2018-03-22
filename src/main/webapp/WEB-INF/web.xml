@@ -6,11 +6,11 @@
     <display-name>Archetype Created Web Application</display-name>
     <servlet>
         <servlet-name>Analyse</servlet-name>
-        <servlet-class>com.chrisdmilner.webapp.Analyse</servlet-class>
+        <servlet-class>com.chrisdmilner.webapp.servlets.Analyse</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Update</servlet-name>
-        <servlet-class>com.chrisdmilner.webapp.Update</servlet-class>
+        <servlet-class>com.chrisdmilner.webapp.servlets.Update</servlet-class>
     </servlet>
 
     <servlet-mapping>
