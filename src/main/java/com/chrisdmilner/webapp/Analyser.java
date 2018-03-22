@@ -8,28 +8,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+/*
+ * Analyser Class
+ *
+ * Contains functions for analysing a list of facts and converting it to a list of conclusions.
+ *
+ * */
 public class Analyser {
 
-    // TODO:
-    //  - Sexuality
-    //  - Locations (Map?)
-    //  - Interests
-    //  - Languages
-    //  - Online Activity (Graph)
-
-    private final static int CURRENT_YEAR = 2018;
+    private static int CURRENT_YEAR;
     private static double FB_ROOT_CONF;
     private static double TW_ROOT_CONF;
     private static double RD_ROOT_CONF;
 
+    // The root function of the class which calls all of the other functions. Analyses a Factbook (list of facts) and
+    // returns a list of conclusions.
     public static ArrayList<Conclusion> analyse(FactBook f) {
+
+        // Intialise the analyser.
         System.out.println("\n - STARTING ANALYSER - \n");
         setRootConfidences();
-
-        ArrayList<Conclusion> conclusions = new ArrayList<>();
+        CURRENT_YEAR = Util.getCurrentYear();
 
         System.out.println("   Analysing Posts");
-        conclusions.addAll(TextAnalyser.analyse(f));
+        ArrayList<Conclusion> conclusions = new ArrayList<>(TextAnalyser.analyse(f));
 
         System.out.println("   Breaking down Name Parts");
         analyseName(f);
@@ -80,17 +82,24 @@ public class Analyser {
         return conclusions;
     }
 
+    // Breaks full names down into their separate parts and look for birth year information.
     protected static void analyseName(FactBook fb) {
+        // Get all of the full name facts.
         ArrayList<Fact> names = fb.getFactsWithName("Name");
 
+        // Break down each full name and add the name parts as new facts.
         for (Fact<String> name : names) {
             String[] tokens = tokeniseName(name);
             addNameTokens(fb, tokens, name);
+
+            // Look for numbers which could be the user's birth year.
             findBirthYear(fb, name);
         }
     }
 
+    // Break down a full name into its constituent, first, middle and last names.
     private static String[] tokeniseName(Fact<String> name) {
+        // Get rid of any numbers in the name.
         String value = Util.removeNumbers(name.getValue());
         ArrayList<String> tokens = new ArrayList<>();
 
@@ -107,6 +116,7 @@ public class Analyser {
             }
         }
 
+        // Remove any empty tokens.
         for (String token : tokens) {
             if (token.isEmpty() || token.equals(" ")) tokens.remove(token);
         }
@@ -114,40 +124,51 @@ public class Analyser {
         return tokens.toArray(new String[tokens.size()]);
     }
 
+    // Takes a list of token parts of a name and adds them as separate facts.
     private static void addNameTokens(FactBook fb, String[] tokens, Fact source) {
-        // TODO: Handle title e.g. Mr
-
+        // Remove anything that isn't letters from all of the tokens.
         for (int i = 0; i < tokens.length; i++) {
             tokens[i] = Util.removeNonLetters(tokens[i]);
         }
 
+        // Add the first token as the first name.
         fb.addFact(new Fact<>("First Name", tokens[0], source));
 
         if (tokens.length == 1) return;
 
+        // Add the last token as a last name.
         fb.addFact(new Fact<>("Last Name", tokens[tokens.length - 1], source));
 
+        // Add any tokens in between as middle names.
         if (tokens.length > 2) {
             for (int i = 1; i < tokens.length - 1; i++)
                 fb.addFact(new Fact<>("Middle Name", tokens[i], source));
         }
     }
 
+    // Look for a birth year in a full name and add it as a fact if it exists.
     private static void findBirthYear(FactBook fb, Fact<String> name) {
+        // Get all the number parts of the name.
         String[] nums = name.getValue().split("[^0-9]");
+
         DateFormat df = new SimpleDateFormat("yyyy");
         for (String num : nums) {
+            // Ignore empty tokens.
             if (num.length() == 0) continue;
 
+            // Get the number as an integer.
             int intnum = Integer.parseInt(num);
             try {
+                // If the number is two digits then treat it as a last two digits of a year e.g. 19(97).
                 if (num.length() == 2) {
+                    // If the number is greater than the current year then add 19 in front otherwise add 20.
                     if (intnum > (CURRENT_YEAR - 2000))
                         fb.addFact(new Fact<>("Birth Year", df.parse("19" + num), name));
                     else
                         fb.addFact(new Fact<>("Birth Year", df.parse("20" + num), name));
-                } else if (num.length() == 4 && intnum > 1900 && intnum <= CURRENT_YEAR)
+                } else if (num.length() == 4 && intnum > 1900 && intnum <= CURRENT_YEAR) {
                     fb.addFact(new Fact<>("Birth Year", df.parse(num), name));
+                }
             } catch (ParseException e) {
                 System.err.println("ERROR converting date to correct format: yyyy");
                 e.printStackTrace();
@@ -155,6 +176,7 @@ public class Analyser {
         }
     }
 
+    // Converts account creation dates to dates that the person must have been born before.
     private static void analyseCreatedAtDates(FactBook f) {
         ArrayList<Fact> dates = f.getFactsWithName("Account Created Date");
 
@@ -163,6 +185,7 @@ public class Analyser {
         }
     }
 
+    // For all of the different name parts it calls the analyse function on them.
     protected static ArrayList<Conclusion> analyseNameParts(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
@@ -177,26 +200,30 @@ public class Analyser {
         return conclusions;
     }
 
+    // Analyses a set of facts about a given name part e.g. first name.
     private static Conclusion analyseNamePart(FactBook f, String namePart) {
-        // TODO: Handle multiple middle names.
-
         // Get the facts for the given name part.
         ArrayList<Fact> names = f.getFactsWithName(namePart);
         if (names.isEmpty()) return null;
 
+        // Combine equal names or names that are a substring of another name. Then get the remaining name with the
+        // greatest confidence.
         ArrayList<Conclusion> conclusions = factsToConclusions(names);
         combineEqualConclusions(conclusions);
         combineContainedNameConclusions(conclusions);
         return getHighestConfidenceConclusion(conclusions);
     }
 
+    // Checks a name against a list of possible names in the same category.
     private static boolean isNameRecognised(String namePart, String potentialName) {
+        // Gets the relevant name list.
         ArrayList<String> names;
         if (namePart.equals("Last Name"))
             names = Util.readResourceFileLines("data/lastnames.csv");
         else
             names = Util.readResourceFileLines("data/firstnames.csv");
 
+        // Checks if the given name appears in the list.
         for (String name : names) {
             if (potentialName.equals(name)) {
                 return true;
@@ -205,6 +232,7 @@ public class Analyser {
         return false;
     }
 
+    // Filters the facts relating to the user's brith date down to most specific value or range we can get.
     protected static ArrayList<Conclusion> analyseBirthYear(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
         ArrayList<Fact> sources = new ArrayList<>();
@@ -217,9 +245,11 @@ public class Analyser {
         if (maxFact != null) maxDate = (Date) maxFact.getValue();
         if (minFact != null) minDate = (Date) minFact.getValue();
 
+        // Get the birth year facts and remove dates outside of the min-max range.
         ArrayList<Fact> birthYears = f.getFactsWithName("Birth Year");
         birthYears = removeDatesOutsideRange(birthYears, minDate, maxDate);
 
+        // Add the min and max facts as sources.
         if (maxFact != null) sources.add(maxFact);
         if (minFact != null) sources.add(minFact);
 

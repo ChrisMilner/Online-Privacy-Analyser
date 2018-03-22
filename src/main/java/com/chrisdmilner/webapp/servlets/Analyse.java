@@ -39,7 +39,6 @@ public class Analyse extends HttpServlet {
             json = Miner.mine(fb, tw, rd, at);
         } catch (Exception e) {
             // If there is an error then respond "Failed" to the client.
-            System.err.println(json);
             e.printStackTrace();
             httpServletResponse.getWriter().write("Failed");
             httpServletResponse.getWriter().flush();

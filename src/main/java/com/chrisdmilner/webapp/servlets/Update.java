@@ -6,15 +6,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
+/*
+ * Update Servlet
+ *
+ * Handles the updating of the root confidences based on user feedback. Takes in the number of correct and incorrect
+ * conclusions from each root source, calculates the percentage accuracy and then updates the root confidences to move
+ * closer to those accuracies.
+ *
+ * */
 public class Update extends HttpServlet {
 
+    // The portion of the difference changed on each update.
     private static final double UPDATE_RATE = 0.1;
 
+    // Handles the GET requests from the client containing the accuracy values.
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
+        // Read the correct and inccorrect values from the request.
         System.out.println("Session Ended");
         System.out.println("Updating Confidences");
         double fbc = Double.parseDouble(httpServletRequest.getParameter("fbc"));
@@ -29,6 +39,7 @@ public class Update extends HttpServlet {
         double rdw = Double.parseDouble(httpServletRequest.getParameter("rdw"));
         System.out.println("   Reddit: Correct=" + rdc + " Wrong=" + rdw);
 
+        // Convert the values into accuracies. Set the accuracy to -1 if their are zero values for a source.
         double fbPercent = -1;
         if ((fbc + fbw) != 0) fbPercent = fbc / (fbc + fbw);
         double twPercent = -1;
@@ -37,6 +48,7 @@ public class Update extends HttpServlet {
         if ((rdc + rdw) != 0) rdPercent = rdc / (rdc + rdw);
         System.out.println("   Percents: FB="+fbPercent+" TW="+twPercent+" RD="+rdPercent);
 
+        // Get the values from the file containing the root confidences.
         double fbr;
         double twr;
         double rdr;
@@ -53,6 +65,7 @@ public class Update extends HttpServlet {
             return;
         }
 
+        // Calculate the updated confidences.
         double newFB = fbr;
         if (fbPercent != -1) newFB += (fbPercent - fbr) * UPDATE_RATE;
         double newTW = twr;
@@ -62,6 +75,7 @@ public class Update extends HttpServlet {
 
         System.out.println("Updated Confidences: FB="+newFB+" TW="+newTW+" RD="+newRD);
 
+        // Write the confidences back to the file.
         ArrayList<String> lines = new ArrayList<>();
         lines.add("fb="+newFB);
         lines.add("tw="+newTW);
