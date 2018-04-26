@@ -16,28 +16,39 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * Reddit Miner
+ *
+ * Uses the JRAW library to access the user's Reddit data and parse it into facts.
+ *
+ * */
 public class RedditMiner {
 
+    // Extracts the available Reddit data for a given username.
 	public static FactBook mine(String name) {
 
 	    System.out.println("\n - STARTING REDDIT MINER - \n");
 
+	    // Create the Factbook and the root fact.
 		FactBook fb = new FactBook();
 		Fact rootFact = new Fact<>("Reddit Account", name, null);
 		fb.addFact(rootFact);
 
 		System.out.println("   Connecting to API and retrieving user data");
 
+		// Initialise the user and Reddit API instance.
 		UserAgent ua = new UserAgent("desktop", "com.chrisdmilner.analyser","1.0.0","RadioactiveMonkey123");
 
 		RedditClient reddit = OAuthHelper.automatic(new OkHttpNetworkAdapter(ua), getCredentials());
         reddit.setLogHttp(false);
 
+        // Get the user's account.
 		OtherUserReference user = reddit.user(name);
 		Account account = user.about();
 
 		System.out.println("   Processing the user's profile data");
 
+		// Extract the profile data into facts.
 		fb.addFact(new Fact<>("Name", name, rootFact));
 		fb.addFact(new Fact<>("Account Created Date", account.getCreated(), rootFact));
 
@@ -48,6 +59,7 @@ public class RedditMiner {
         List<PublicContribution<?>> comments = commentPaginator.accumulateMerged(-1);
         MinedPost curr;
 
+        // Process the user's comments into mined posts then facts.
         for (PublicContribution<?> comment : comments) {
             curr = new MinedPost(comment.getCreated(), null, null, null, comment.getBody(), new String[0], true);
             fb.addFact(new Fact<>("Commented", curr, rootFact));
@@ -57,6 +69,7 @@ public class RedditMiner {
         System.out.println("   Processing the user's posts");
 		DefaultPaginator<PublicContribution<?>> postPaginator = user.history("submitted").build();
 
+		// Process the user's posts into mined posts then facts.
         List<PublicContribution<?>> posts = postPaginator.accumulateMerged(-1);
         for (PublicContribution<?> post : posts) {
             Submission postData = ((SubmissionReference) post.toReference(reddit)).inspect();
@@ -69,6 +82,7 @@ public class RedditMiner {
 
         System.out.println("   Processing the user's subreddits");
 
+        // Process the user's subscribed subreddits as interests.
         for (String subreddit : subreddits)
             fb.addFact(new Fact<>("Interest", subreddit, rootFact));
 
@@ -77,6 +91,7 @@ public class RedditMiner {
 		return fb;
 	}
 
+	// Sets up the JRAW credentials.
 	private static Credentials getCredentials() {
 		UUID uuid = UUID.randomUUID();
 

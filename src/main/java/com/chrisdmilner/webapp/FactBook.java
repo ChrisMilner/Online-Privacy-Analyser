@@ -2,10 +2,15 @@ package com.chrisdmilner.webapp;
 
 import java.util.ArrayList;
 
-// Stores a collection of facts.
+/*
+ * Factbook
+ *
+ * Stores a list of facts. Also contains a selection of helper function for interacting with the list.
+ *
+ * */
 public class FactBook {
 
-	private ArrayList<Fact> facts;
+	private ArrayList<Fact> facts;		// The list of the Facts.
 
 	public FactBook() {
 		facts = new ArrayList<Fact>();
@@ -24,6 +29,7 @@ public class FactBook {
 		return facts;
 	}
 
+	// Returns only the Facts from the list with the given Fact name.
 	public ArrayList<Fact> getFactsWithName(String name) {
 	    ArrayList<Fact> fs = new ArrayList<>();
 	    for (Fact fact : facts) {
@@ -36,6 +42,7 @@ public class FactBook {
 		return facts.size();
 	}
 
+	// Converts the Factbook to a human readable version for command line output.
 	public String toString() {
 		String out = "";
 

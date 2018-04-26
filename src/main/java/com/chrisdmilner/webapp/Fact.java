@@ -3,7 +3,13 @@ package com.chrisdmilner.webapp;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-// Stores a fact extracted by the Miner.
+/*
+ * Fact
+ *
+ * Stores a single piece of information mined from a user's profile in a name-value pair. Also includes a source Fact
+ * which can be used to trace the source of this Fact back to its root.
+ *
+ * */
 public class Fact<T> {
 
 	private String name;		// The name of the fact. 
@@ -28,6 +34,7 @@ public class Fact<T> {
 		return source;
 	}
 
+	// Converts the Fact to a human readable version for command line output.
 	public String toString() {
 		String out = "";
 
@@ -44,6 +51,7 @@ public class Fact<T> {
 		return out;
 	}
 
+	// Converts the Fact to a JSON representation.
 	public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
         json.put("name", name);

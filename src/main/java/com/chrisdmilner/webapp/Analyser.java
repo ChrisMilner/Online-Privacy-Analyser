@@ -255,22 +255,27 @@ public class Analyser {
 
         // Combine the remaining birth years to get a final answer.
         if (!birthYears.isEmpty()) {
+            // Combine all of the potential birth year, then choose the year with the highest confidence.
             ArrayList<Conclusion> cs = factsToConclusions(birthYears);
             combineEqualConclusions(cs);
             Conclusion bestYear = getHighestConfidenceConclusion(cs);
             sources.addAll(bestYear.getSources());
 
+            // Get that year as a string and add it as a conclusion.
             int yearInt = Util.getYearFromDate((Date) bestYear.getValue());
             String year = Integer.toString(yearInt);
             conclusions.add(new Conclusion<>("Birth Year", year, bestYear.getConfidence(), sources));
 
+            // Use the year to get an age range and add that as a conclusion.
             int maxAge = Util.getCurrentYear() - yearInt;
             String age = (maxAge - 1) + " - " + maxAge;
             conclusions.add(new Conclusion<>("Age", age, bestYear.getConfidence(), sources));
         } else if (maxFact != null && minFact != null) {
+            // Combine the confidences of the min and max date facts.
             double confidence = getConfidenceFromSource(maxFact.getSource());
             confidence *= getConfidenceFromSource(minFact.getSource());
 
+            // Add the year and age range as a string and add them as conclusions.
             int y1 = Util.getYearFromDate(minDate);
             int y2 = Util.getYearFromDate(maxDate);
             String year = y1 + " - " + y2;
@@ -280,6 +285,7 @@ public class Analyser {
             String age = (currYear - y2) + " - " + (currYear - y1);
             conclusions.add(new Conclusion<>("Age", age, confidence, sources));
         } else if (maxFact != null) {
+            // Get the max year and use that to get a min age and add that as a conclusion.
             int currYear = Util.getCurrentYear();
             int maxYear = Util.getYearFromDate(maxDate);
 
@@ -288,6 +294,7 @@ public class Analyser {
             double confidence = getConfidenceFromSource(maxFact.getSource());
             conclusions.add(new Conclusion<>("Age", age, confidence, sources));
         } else if (minFact != null) {
+            // Get the min year and use that to get a max age and add that as a conclusion.
             int currYear = Util.getCurrentYear();
             int maxYear = Util.getYearFromDate(minDate);
 
@@ -300,8 +307,8 @@ public class Analyser {
         return conclusions;
     }
 
+    // Gets the oldest max birth date e.g. the most restrictive value.
     private static Fact getMaxBirthDate(FactBook f) {
-        // Get the latest possible dates that could be their birth date.
         ArrayList<Fact> maxBDays = f.getFactsWithName("Max Birth Date");
 
         // Get the earliest of the max dates.
@@ -319,8 +326,8 @@ public class Analyser {
         return maxFact;
     }
 
+    // Gets the most recent min birth date e.g. the most restrictive value.
     private static Fact getMinBirthDate(FactBook f) {
-        // Get the earliest possible dates that could be their birth date.
         ArrayList<Fact> minBDays = f.getFactsWithName("Min Birth Date");
 
         // Get the latest of the min dates.
@@ -338,7 +345,9 @@ public class Analyser {
         return minFact;
     }
 
+    // Removes dates from a list where they are outside of the min and max values.
     private static ArrayList<Fact> removeDatesOutsideRange(ArrayList<Fact> dates, Date min, Date max) {
+        // Check each date to see if it is outside the range.
         Date d;
         for (int i = dates.size() - 1; i >= 0; i--) {
             d = (Date) dates.get(i).getValue();
@@ -351,10 +360,12 @@ public class Analyser {
         return dates;
     }
 
+    // Formats all of the months into a standard form then uses the decide function to get a final conclusion.
     private static Conclusion analyseBirthMonth(FactBook f) {
         ArrayList<Fact> months = f.getFactsWithName("Birth Month");
         ArrayList<Fact> correctMonths = new ArrayList<>();
 
+        // Convert each month to the standardised form and remove nulls.
         for (int i = 0; i < months.size(); i++) {
             String month = getMonthName((String) months.get(i).getValue());
             if (month != null)
@@ -364,12 +375,16 @@ public class Analyser {
         return decideBetweenFacts(correctMonths);
     }
 
+    // Converts the different forms of a month into a standard form.
     private static String getMonthName(String month) {
         int num;
+
+        // If the month contains numbers then treat it as a number month.
         if (month.matches(".*\\d+.*")) {
             num = Integer.parseInt(month);
             if (num < 1 || num > 12) return null;
         } else {
+            // Convert text months to numbers.
             month = month.toLowerCase();
             if (month.contains("jan"))
                 num = 1;
@@ -398,6 +413,7 @@ public class Analyser {
             else return null;
         }
 
+        // Convert the number version of the month back to a full month.
         switch (num) {
             case 1: return "January";
             case 2: return "February";
@@ -416,37 +432,50 @@ public class Analyser {
         return null;
     }
 
+    // Combines the birth day facts into a single conclusion.
     private static Conclusion analyseBirthDay(FactBook f) {
         ArrayList<Fact> days = f.getFactsWithName("Birth Day");
 
+        // Parses each of the day numbers and removes any outside of the 1-31 range.
         for (int i = 0; i < days.size(); i++) {
             int num = Integer.parseInt((String) days.get(i).getValue());
             if (num < 1 || num > 31) days.remove(i);
         }
 
+        // Decide on the final conclusion.
         return decideBetweenFacts(days);
     }
 
+    // Combines the facts for religion or politics into a final conclusion.
     private static Conclusion analyseReligionPolitics(FactBook f, String name) {
+
+        // Get the relevant facts.
         ArrayList<Fact> facts = f.getFactsWithName(name);
         ArrayList<Fact> correctedFacts = new ArrayList<>();
 
+        // Remove anything in brackets from the facts as well as excess whitespace.
         for (Fact fact : facts) {
             String value = ((String) fact.getValue()).replaceAll("\\(.*\\)", "").trim();
             correctedFacts.add(new Fact<>(name, value, fact));
         }
 
+        // Combine the reformatted facts.
         return decideBetweenFacts(correctedFacts);
     }
 
+    // Combine the facts for work and education into a final conclusion.
     private static ArrayList<Conclusion> analyseWorkEducation(FactBook f) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
+        // Get all the work and education facts and add them into the same list.
         ArrayList<Fact> periods = f.getFactsWithName("Work");
         periods.addAll(f.getFactsWithName("Education"));
+
+        // For each work or education.
         for (Fact p : periods) {
             MinedPeriod mp = (MinedPeriod) p.getValue();
 
+            // Format the mined period into a string representation.
             String value = "";
             if (mp.getDiscipline() != null) {
                 value += mp.getDiscipline();
@@ -457,6 +486,7 @@ public class Analyser {
                 value += mp.getInstitution();
             }
 
+            // Add the year range to the string if available.
             if (mp.getStartYear() != null && !mp.getStartYear().equals("0000-00") && mp.getEndYear() != null && !mp.getEndYear().equals("0000-00")) {
                 value += " (" + mp.getStartYear() + " - " + mp.getEndYear() + ")";
             } else if (mp.getStartYear() != null && !mp.getStartYear().equals("0000-00")) {
@@ -465,6 +495,7 @@ public class Analyser {
                 value += " (" + mp.getEndYear() + ")";
             }
 
+            // Get the confidences and add the newly formatted conclusions.
             ArrayList<Fact> sources = new ArrayList<>();
             sources.add(p);
             double confidence =  getConfidenceFromSource(p);
@@ -475,10 +506,12 @@ public class Analyser {
         return conclusions;
     }
 
+    // Converts facts into conclusions.
     private static ArrayList<Conclusion> getFactsAsConclusions(FactBook f, String factName) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
         ArrayList<Fact> facts = f.getFactsWithName(factName);
 
+        // Parses each fact into a conclusion with the fact as its only sources.
         for (Fact fact : facts) {
             double confidence =  getConfidenceFromSource(fact);
             ArrayList<Fact> sources = new ArrayList<>();
@@ -489,6 +522,7 @@ public class Analyser {
         return conclusions;
     }
 
+    // Performs the data combining algorithm on a list of facts.
     private static Conclusion decideBetweenFacts(ArrayList<Fact> facts) {
         if (facts.isEmpty()) return null;
 
@@ -496,16 +530,18 @@ public class Analyser {
         combineEqualConclusions(conclusions);
         Conclusion<String> c = getHighestConfidenceConclusion(conclusions);
 
+        // Uppercase the first letter to make it more visually appealing and format into a Conclusion.
         String value = Util.uppercaseFirstLetter(c.getValue());
         return new Conclusion<>(c.getName(), value, c.getConfidence(), c.getSources());
     }
 
+    // Overloaded method where name of a set of facts is given instead of a list.
     private static Conclusion decideBetweenFacts(FactBook f, String factName) {
         ArrayList<Fact> facts = f.getFactsWithName(factName);
         return decideBetweenFacts(facts);
     }
 
-
+    // Converts facts to conclusions and normalises their confidences.
     private static ArrayList<Conclusion> factsToConclusions(ArrayList<Fact> facts) {
         ArrayList<Conclusion> conclusions = new ArrayList<>();
 
@@ -517,6 +553,8 @@ public class Analyser {
             sources.add(f);
             double confidence = getConfidenceFromSource(f.getSource());
             total += confidence;
+
+            // Calulate the probability of none of the values being correct.
             incorrectProb *= (1.0 - confidence);
             conclusions.add(new Conclusion<>(f.getName(), f.getValue(), confidence, sources));
         }
@@ -529,6 +567,7 @@ public class Analyser {
         return conclusions;
     }
 
+    // Combines any conclusions with equal values.
     private static void combineEqualConclusions(ArrayList<Conclusion> conclusions) {
         // Compare all conclusions and combine the duplicates.
         for (int i = 1; i < conclusions.size(); i++) {
@@ -544,13 +583,17 @@ public class Analyser {
         }
     }
 
+    // Combines any conclusions with equal values or values which are a substring of the other.
     private static void combineContainedNameConclusions(ArrayList<Conclusion> conclusions) {
+        // Compare each pair of values.
         for (int i = 1; i < conclusions.size(); i++) {
             for (int j = 0; j < i; j++) {
                 String s1 = (String) conclusions.get(i).getValue();
                 String s2 = (String) conclusions.get(j).getValue();
                 boolean decision = false;
                 boolean contains = false;
+
+                // Check if either contains the other.
                 if (s1.contains(s2)) {
                     contains = true;
                     decision = decideBetweenNames(conclusions.get(i).getName(), s1, s2);
@@ -559,6 +602,7 @@ public class Analyser {
                     decision = !decideBetweenNames(conclusions.get(i).getName(), s2, s1);
                 }
 
+                // If one contains the other then remove the correct conclusion.
                 if (contains) {
                     if (decision) {
                         conclusions.get(i).addSources(conclusions.get(j).getSources());
@@ -569,13 +613,17 @@ public class Analyser {
                         conclusions.get(j).setConfidence(conclusions.get(j).getConfidence() + conclusions.get(i).getConfidence());
                         conclusions.remove(i);
                     }
+
+                    // Move the loops back one as an item has been moved.
                     i--; j--;
                 }
             }
         }
     }
 
+    // Decide which name is more representative of the pair.
     private static boolean decideBetweenNames(String namePart, String n1, String n2) {
+        // Check if either name is contained in the list of names.
         boolean n1Recognised = isNameRecognised(namePart, n1);
         boolean n2Recognised = isNameRecognised(namePart, n2);
 
@@ -585,6 +633,7 @@ public class Analyser {
         else return n1Recognised;
     }
 
+    // Choose the conclusion with the highest confidence.
     private static Conclusion getHighestConfidenceConclusion(ArrayList<Conclusion> conclusions) {
         if (conclusions.isEmpty()) return null;
 
@@ -600,6 +649,7 @@ public class Analyser {
         return conclusions.get(index);
     }
 
+    // Gets the confidence of a conclusion based on a source.
     protected static double getConfidenceFromSource(Fact source) {
         double confidence = 1;
 
@@ -619,7 +669,9 @@ public class Analyser {
         return confidence;
     }
 
+    // Reads in the root confidences from the file.
     private static void setRootConfidences() {
+        // Read the files, if it fails then use the default values.
         try {
             String file = Util.readFileToString(Util.getResourceURI() + "properties/confidence.properties");
 

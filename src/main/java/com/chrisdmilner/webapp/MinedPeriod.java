@@ -1,11 +1,17 @@
 package com.chrisdmilner.webapp;
 
+/*
+ * Mined Period
+ *
+ * Stores information about a particular period of time in the user's life, either a period of education or work.
+ *
+ * */
 public class MinedPeriod {
 
-    private String discipline;
-    private String institution;
-    private String startYear;
-    private String endYear;
+    private String discipline;      // The discipline of study or the job title.
+    private String institution;     // The school or place of work.
+    private String startYear;       // The year they started there.
+    private String endYear;         // The year they left there.
 
     public MinedPeriod(String discipline, String institution, String startYear, String endYear) {
         this.discipline = discipline;
@@ -30,6 +36,7 @@ public class MinedPeriod {
         return endYear;
     }
 
+    // Converts the period to a human readable version for command line output.
     public String toString() {
         return discipline + " at " + institution + " (" + startYear + " - " + endYear + ")";
     }

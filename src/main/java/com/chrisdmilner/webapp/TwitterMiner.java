@@ -7,7 +7,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-// Contains functions related to Twitter data mining.
+/*
+ * Twitter Miner
+ *
+ * Mines a user's twitter account and parses the data into facts.
+ *
+ * */
 public class TwitterMiner {
 
 	private final static int MAX_FOLLOWER_COUNT = 10000; 	// The number of followers the user can have before they will not be processed.
@@ -18,6 +23,7 @@ public class TwitterMiner {
 
         System.out.println("\n - STARTING TWITTER MINER - \n");
 
+        // Initialise the factbook and the root fact.
 		FactBook fb = new FactBook();
 		Fact rootFact = new Fact<>("Twitter Account", screenName, null);
 		fb.addFact(rootFact);
@@ -46,6 +52,7 @@ public class TwitterMiner {
 		if (!u.isDefaultProfileImage()) fb.addFact(new Fact<>("Image URL", u.getOriginalProfileImageURL(), rootFact));
 		if (!u.getDescription().equals("")) fb.addFact(new Fact<>("Description", u.getDescription(), rootFact));
 
+		// Add any urls attached to the account as facts.
 		URLEntity[] urls = u.getDescriptionURLEntities();
 		if (urls.length > 0) {
 			for (int i = 0; i < urls.length; i++) {
@@ -54,16 +61,17 @@ public class TwitterMiner {
 		}
 
 		fb.addFact(new Fact<>("Account Created Date", u.getCreatedAt(), rootFact));
-		fb.addFact(new Fact<>("Language", u.getLang(), rootFact));
-		fb.addFact(new Fact<>("Location", u.getLocation(), rootFact));
-		fb.addFact(new Fact<>("Time Zone", u.getTimeZone(), rootFact));
-		fb.addFact(new Fact<>("Linked URL", u.getURLEntity().getExpandedURL(), rootFact));
+		if (u.getLang() != null) fb.addFact(new Fact<>("Language", u.getLang(), rootFact));
+		if (u.getLocation() != null) fb.addFact(new Fact<>("Location", u.getLocation(), rootFact));
+		if (u.getTimeZone() != null) fb.addFact(new Fact<>("Time Zone", u.getTimeZone(), rootFact));
+		if (u.getURLEntity() != null) fb.addFact(new Fact<>("Linked URL", u.getURLEntity().getExpandedURL(), rootFact));
 
 		System.out.println("   Processing the user's tweets");
 
 		// Get the tweets and add them as facts.
 		ArrayList<Status> tweets = getTweets(twitter, id);
 
+		// Parse tweets into mined posts and then facts.
 		for (int i = 0; i < tweets.size(); i++) {
 			fb.addFact(new Fact<MinedPost>("Posted", mineTweet(tweets.get(i)), rootFact));
 		}
@@ -90,6 +98,7 @@ public class TwitterMiner {
 		return fb;
 	}
 
+	// Configure Twitter4J's API instance using the parameters in the config file.
 	private static ConfigurationBuilder configureT4J() {
         ConfigurationBuilder cb = new ConfigurationBuilder();
 
@@ -256,7 +265,6 @@ public class TwitterMiner {
 				if (rls.getRemaining() <= 0) {
 					System.out.println("   Waiting " + rls.getSecondsUntilReset() + "s for rate limit");
 					TimeUnit.SECONDS.sleep(rls.getSecondsUntilReset() + 1);
-					//System.out.println("Waiting finished. " + t.getRateLimitStatus().get(endpoint).getSecondsUntilReset() + "s until next reset");
 				}
 			} else {
 				System.err.println(endpoint + " endpoint is incorrect");

@@ -55,7 +55,7 @@
         <div id="start-points">
             <form action="analyse.jsp" method="POST">
                 <h2 id="instructions">To begin input a link to as many or as few (minimum 1) of the categories below. Then click the "Analyse" button below:</h2>
-                <h3 class="label">Facebook:</h3>
+                <h3 class="label">Facebook Profile URL:</h3>
                 <input type="text" name="facebook-url"><br />
                 <h2>or</h2>
                 <div id="fb-login-div">
@@ -96,9 +96,9 @@
                     <p id="login-fail-text">Facebook authentication failed. Please try again.</p>
                     <p id="login-success-text">Facebook account authenticated.</p>
                 </div>
-                <h3 class="label">Twitter:</h3>
+                <h3 class="label">Twitter Profile URL:</h3>
                 <input type="text" name="twitter-url"><br />
-                <h3 class="label">Reddit:</h3>
+                <h3 class="label">Reddit Profile URL:</h3>
                 <input type="text" name="reddit-url"><br />
                 <input type="submit" name="analyse"><br />
                 <input type="hidden" name="access-token" id="access-token">

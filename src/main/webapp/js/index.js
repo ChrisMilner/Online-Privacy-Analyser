@@ -1,6 +1,7 @@
 window.onload = function () {
     var btn = document.getElementById("fb-login");
 
+    // Add the Facebook login function.
     btn.onclick = function () {
         console.log("Login button pressed");
 
@@ -11,6 +12,7 @@ window.onload = function () {
             console.log("Got a response");
             console.log(response);
 
+            // Display message on success or failure.
             if (response.status === "connected") {
                 console.log("FB Login Successful");
                 document.getElementById("access-token").value = response.authResponse.accessToken;
@@ -22,6 +24,7 @@ window.onload = function () {
         }, {scope: perms});
     };
 
+    // Interpret the checkboxes ticked by the user as a list of permissions.
     function getFBPermissions() {
         var string = "public_profile,";
 

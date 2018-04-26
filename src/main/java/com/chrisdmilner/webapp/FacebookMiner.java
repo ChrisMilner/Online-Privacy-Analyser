@@ -7,14 +7,20 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
 
-// Contains functions related to Facebook data mining.
+/*
+ * Facebook Miner
+ *
+ * Uses the Facebook4J library to connect to the Facebook API, retrieve the user's data and parse into Fact form.
+ *
+ * */
 public class FacebookMiner {
 
-	// Extracts the available Facebook data for a given user ID.
+	// Extracts the available Facebook data for a given user ID or acess token.
 	public static FactBook mine(String id, String at) {
 
         System.out.println("\n - STARTING FACEBOOK MINER - \n");
 
+        // Set up the Factbook and the root fact.
 	    FactBook fs = new FactBook();
 	    Fact rootFact = new Fact<>("Facebook Account", id, null);
         fs.addFact(rootFact);
@@ -29,8 +35,7 @@ public class FacebookMiner {
 		User u = null;
         URL picURL;
 		try {
-            fb.extendTokenExpiration();
-
+            // All the data we want to access if we can.
             Reading reading = new Reading().fields( "about",        "address",          "age_range",
                                                     "birthday",     "cover",            "education",
                                                     "email",        "first_name",       "gender",
@@ -42,13 +47,16 @@ public class FacebookMiner {
 
             System.out.println("   Processing the user's profile data");
 
+            // If there is no access token use basic access.
             if (at.equals("")) {
                 u = fb.getUser(id, reading);
 
+                // Get their profile image.
                 picURL = fb.getPictureURL(id, PictureSize.large);
             } else {
                 u = fb.getMe(reading);
 
+                // Get the user's photos.
                 Reading r = new Reading().fields("images");
                 ResponseList<Photo> photos = fb.getPhotos(r);
                 List<Image> images;
@@ -60,11 +68,6 @@ public class FacebookMiner {
                 }
 
                 picURL = fb.getPictureURL(PictureSize.large);
-
-                // TODO fb.getVideos (logged in or not)
-
-                // TODO fb.getInterests etc.
-
             }
 
 		} catch (FacebookException e) {
@@ -73,6 +76,7 @@ public class FacebookMiner {
 			return fs;
 		}
 
+		// Add all the languages as facts.
 		if (u.getLanguages() != null) {
 			for (int i = 0; i < u.getLanguages().size(); i++) {
 				fs.addFact(new Fact<>("Language", u.getLanguages().get(i).getName(), rootFact));
@@ -139,6 +143,7 @@ public class FacebookMiner {
         if (u.getSignificantOther() != null)    fs.addFact(new Fact<>("Partner", u.getSignificantOther().getName(), rootFact));
         if (u.getCover() != null)               fs.addFact(new Fact<>("Image URL", u.getCover().getSource(), rootFact));
 
+        // Add the user's education.
         if (u.getEducation() != null) {
             List<User.Education> educations = u.getEducation();
             for (User.Education edu : educations) {
@@ -150,6 +155,7 @@ public class FacebookMiner {
             }
         }
 
+        // Add the user's work history.
         if (u.getWork() != null) {
             List<User.Work> work = u.getWork();
             for (User.Work w : work) {
@@ -165,6 +171,7 @@ public class FacebookMiner {
 		return fs;
 	}
 
+	// Configures the Facebook4J Facebook build with all the settings and the access token if available.
 	private static ConfigurationBuilder configureF4J(String at) {
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 
@@ -177,7 +184,6 @@ public class FacebookMiner {
 
 		if (at.equals("")) {
 		    System.out.println("   Not using the given Access Token");
-//		    System.out.println(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
 		    cb.setOAuthAccessToken(Util.getConfigParameter(props,"f4j.oauth.accessToken="));
         } else cb.setOAuthAccessToken(at);
 

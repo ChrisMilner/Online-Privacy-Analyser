@@ -1,8 +1,10 @@
-var OPEN_SOURCE_TEXT = "Expand";
-var CLOSE_SOURCE_TEXT = "Close";
-var NO_SOURCE_TEXT = "You";
+var OPEN_SOURCE_TEXT = "Expand";    // The text in an unexpanded fact.
+var CLOSE_SOURCE_TEXT = "Close";    // The text in an expanded fact.
+var NO_SOURCE_TEXT = "You";         // The text in a root fact.
 
 window.onload = function () {
+
+    // Add onclick function for every expand sources button.
     var sources = document.getElementsByClassName("sources");
     for (var i = 0; i < sources.length; i++) {
         if (sources[i].getAttribute("data-srcno") === "0") continue;
@@ -19,6 +21,7 @@ window.onload = function () {
         }
     }
 
+    // Add onclick function for every image.
     var images = document.getElementsByTagName("img");
     for (i = 0; i < images.length; i++) {
         images[i].onclick = function () {
@@ -27,6 +30,7 @@ window.onload = function () {
             var sourceTable = document.getElementById("image-source-table");
             var sourceJSON = JSON.parse(this.getAttribute("data-sources"));
 
+            // Display the sources in a table.
             var rowIndex = 1;
             for (var j = 0; j < sourceJSON.length; j++) {
                 addImageSource(sourceTable, rowIndex++, sourceJSON[j].name, sourceJSON[j].value);
@@ -40,11 +44,13 @@ window.onload = function () {
                 }
             }
 
+            // Put the image's attributes into the large view and make the view visible.
             largeImage.setAttribute("src", this.getAttribute("src"));
             details.classList.remove("hidden");
         }
     }
 
+    // Add the onlick function for the close button.
     document.getElementById("close-btn").onclick = function () {
         var details = document.getElementsByClassName("image-details")[0];
         var sources = document.getElementById("image-source-table");
@@ -55,6 +61,7 @@ window.onload = function () {
         }
     };
 
+    // Add the functionality to the correct buttons.
     var correctCells = document.getElementsByClassName("correct");
     for (i = 0; i < correctCells.length; i++) {
         correctCells[i].onclick = function () {
@@ -69,6 +76,7 @@ window.onload = function () {
     }
 };
 
+// Sets up the Google Map.
 var map;
 var geocoder;
 function myMap() {
@@ -87,6 +95,7 @@ function myMap() {
     }
 }
 
+// Adds a new marker onto the Google Map at the given address.
 function addMarkerAtAddress(address) {
     geocoder.geocode( { 'address': address}, function(results, status) {
         if (status == 'OK') {
@@ -103,6 +112,7 @@ function addMarkerAtAddress(address) {
     });
 }
 
+// Before exiting the page send feedback to the back-end.
 window.onbeforeunload = function() {
     var fbc = 0;
     var fbw = 0;
@@ -111,6 +121,7 @@ window.onbeforeunload = function() {
     var rdc = 0;
     var rdw = 0;
 
+    // Count up all the correct and incorrect conclusions for each source
     var correctCells = document.getElementsByClassName("correct");
     for (var i = 0; i < correctCells.length; i++) {
         var cell = correctCells[i];
@@ -129,6 +140,7 @@ window.onbeforeunload = function() {
                 nestedSrcNo = Number(nestedRow.getAttribute("data-srcno"));
             }
 
+            // Get the root source type and increase that count.
             var rootText = nestedRow.cells[0].innerHTML;
             if (rootText === "Facebook Account") {
                 if (correct) fbc += increase;
@@ -145,16 +157,20 @@ window.onbeforeunload = function() {
         }
     }
 
+    // Send AJAX to the update servlet which handles feedback.
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "update?fbc="+fbc+"&fbw="+fbw+"&twc="+twc+"&tww="+tww+"&rdc="+rdc+"&rdw="+rdw, true);
     xhttp.send();
 };
 
+// Opens the sources for a given fact or conclusion.
 function openSources(row) {
     row.getElementsByClassName("sources")[0].innerHTML = CLOSE_SOURCE_TEXT;
 
+    // Get the number of sources the fact or conclusion has.
     var srcno = row.getAttribute("data-srcno");
 
+    // Trace through the sources and expand them.
     row = row.nextElementSibling;
     row.classList.add("top");
     for (var i = 0; i < srcno; i++) {
@@ -169,15 +185,19 @@ function openSources(row) {
     }
 }
 
+// Closes the sources for a given fact or conclusion.
 function closeSources(row) {
+    // Get the number of sources.
     var srcno = row.getAttribute("data-srcno");
 
+    // Set the text of the button correctly.
     if (srcno == 0) {
         row.getElementsByClassName("sources")[0].innerHTML = NO_SOURCE_TEXT;
         return;
     } else
         row.getElementsByClassName("sources")[0].innerHTML = OPEN_SOURCE_TEXT;
 
+    // Trace through all of the sub elements and close them.
     row = row.nextElementSibling;
     for (var i = 0; i < srcno; i++) {
         closeSources(row);
@@ -192,6 +212,7 @@ function closeSources(row) {
     }
 }
 
+// Adds a source to the expanded images.
 function addImageSource(table, index, name, value) {
     var row = table.insertRow(index);
     row.insertCell(0).innerHTML = name;

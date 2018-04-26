@@ -7,18 +7,25 @@ import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.util.ArrayList;
 
-// Contains functions related to general data mining
+/*
+ * Miner
+ *
+ * Handles all the individual miners. Combines their data then passes it to the analyser
+ *
+ * */
 public class Miner {
 
-	// Controls all of the mining function, passes data to the anaalyser and outputs conclusions to a file.
+	// Controls all of the mining function, passes data to the analyser and outputs conclusions to a file.
 	public static String mine(String fb, String tw, String rd, String at) {
 
+		// Get the Twitter profile information and call the miner.
 		FactBook twf = new FactBook();
 		if (!tw.equals("")) {
 			String twName = tw.substring(tw.lastIndexOf("/") + 1);
 			twf = TwitterMiner.mine(twName);
 		}
 
+		// Get the Facebook profile information and call the miner.
 		FactBook fbf = new FactBook();
 		if (!(fb.equals("") && at.equals(""))) {
 			String fbId = "";
@@ -26,6 +33,7 @@ public class Miner {
 			fbf = FacebookMiner.mine(fbId, at);
 		}
 
+		// Get the Reddit profile information and call the miner.
 		FactBook rdf = new FactBook();
 		if (!rd.equals("")) {
 			String rdName = rd.substring(rd.lastIndexOf("user/") + 5);
@@ -49,9 +57,6 @@ public class Miner {
 
 		// Convert conclusions to JSON for transporting.
         return conclusionsToJSON(conclusions);
-
-		// Write the conclusions to a file.
-		// writeConclusionsToFile(id, conclusions);
 	}
 
 	protected static String conclusionsToJSON(ArrayList<Conclusion> cs) {
@@ -72,21 +77,5 @@ public class Miner {
 
         return json.toString();
 	}
-
-	// Writes a list of conclusions into a file in JSON format.
-//	private static void writeConclusionsToFile(int id, ArrayList<Conclusion> c) {
-//		ArrayList<String> lines = new ArrayList<>();
-//
-//		// Create the JSON files lines.
-//		lines.add("{\"conclusions\":[");
-//		for (int i = 0; i < c.size(); i++) {
-//			lines.add(c.get(i).toJSON());
-//			if (i < c.size() - 1) lines.set(i, lines.get(i) + ",");
-//		}
-//		lines.add("]}");
-//
-//		// Output the list of lines to a file
-//		Util.outputToFile("../outputs/" + id + ".data", lines);
-//	}
 
 }
